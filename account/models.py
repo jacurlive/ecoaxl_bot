@@ -25,14 +25,10 @@ class Account(models.Model):
     phone_number = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
     is_confirm = models.BooleanField(default=False)
+    latitude = models.CharField(max_length=200)
+    longitude = models.CharField(max_length=200)
     rate = models.ForeignKey(Rates, on_delete=models.CASCADE, blank=True, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.name
-
-
-class Address(models.Model):
-    latitude = models.CharField(max_length=200)
-    longitude = models.CharField(max_length=200)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
