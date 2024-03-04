@@ -9,7 +9,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.filters.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
- 
+
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +39,7 @@ async def fetch_place_data():
         
 
 async def send_place(chat_id, options):
-    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options])
+    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options]) # one line one item
 
     await bot.send_message(chat_id, "Выберите район:", reply_markup=kb)
 
@@ -63,24 +63,38 @@ async def send_rates(chat_id, options):
 async def post_user_info(data):
     url = os.environ['API_ACCOUNT_CREATE']
 
-    # data = {
-    #     "name": name,
-    #     "telegram_id": telegram_id,
-    #     "phone_number": phone_number,
-    #     "place": "1"
-    # }
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, data=data) as response:
             data = await response.json()
             print(data)
             return data
+        
+
+async def user_exist(telegram_id):
+    url = f"http://127.0.0.1:8000/account/{telegram_id}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            response_code = response.status
+            return response_code
+
 
 
 @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
-    await message.answer(f"Привет! Давай начнем процесс регистрации. Введи свое имя:")
-    await state.set_state(RegistrationStates.name)
+    await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/registration - Регистрация")
+
+
+@dp.message(Command("registration"))
+async def start_command(message: types.Message, state: FSMContext):
+    status = await user_exist(message.from_user.id)
+    print(status)
+    if status == 404:
+        await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
+        await state.set_state(RegistrationStates.name)
+    else:
+        await message.answer(f"Вы уже регистрировались!")
 
 
 @dp.message(RegistrationStates.name)
@@ -132,8 +146,9 @@ async def handle_location(message: types.Message, state: FSMContext):
     context = await state.get_data()
     print(context)
     await post_user_info(data=context)
-    # Сохраните координаты или выполните другие действия с ними
-    await message.answer(f"https://www.google.com/maps?q={latitude},{longitude}&ll=41.347763,69.348689&z=16")
+
+    await bot.send_location(message.from_user.id, latitude=latitude, longitude=longitude)
+    
     await bot.send_message(message.from_user.id, "Спасибо за регистрацию!")
     await state.clear()
 
