@@ -140,4 +140,4 @@ dmypy.json
 !**/migrations
 !**/migrations/__init__.py
 
-account/__pycache__/
+**/__pycache__
