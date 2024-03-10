@@ -2,40 +2,55 @@ import os
 import aiohttp
 
 
-async def fetch_place_data():
+async def fetch_place_data(token):
 
-    url = os.environ['API_PLACE']
+    url = f"{os.environ['API']}place/"
 
-    async with aiohttp.ClientSession() as session:
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as response:
             data = await response.json()
             return data
         
-async def fetch_rates_data():
+async def fetch_rates_data(token):
 
-    url = os.environ['API-RATES']
+    url = f"{os.environ['API']}rates/"
 
-    async with aiohttp.ClientSession() as session:
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as response:
             data = await response.json()
             return data
 
 
-async def post_user_info(data):
-    url = os.environ['API_ACCOUNT_CREATE']
+async def post_user_info(data, token):
+    url = url = f"{os.environ['API']}account/"
 
+    headers = {
+        'Authorization': token
+    }
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post(url, data=data) as response:
             data = await response.json()
             print(data)
             return data
         
 
-async def user_exist(telegram_id):
-    url = f"{os.environ['API_ACCOUNT_CREATE']}{telegram_id}"
+async def user_exist(telegram_id, token):
+    url = f"{os.environ['API']}account/{telegram_id}"
 
-    async with aiohttp.ClientSession() as session:
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as response:
             response_code = response.status
             return response_code

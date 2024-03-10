@@ -8,4 +8,9 @@ class RegistrationStates(StatesGroup):
     place = State()
     rate = State()
     location = State()
+    house = State()
+    apartment = State()
+    entrance = State()
+    floor = State()
+    comment = State()
     

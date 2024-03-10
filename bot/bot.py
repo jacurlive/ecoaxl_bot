@@ -44,7 +44,7 @@ async def help_command(message: types.Message):
 
 @dp.message(Command("registration"))
 async def registration_start(message: types.Message, state: FSMContext):
-    status = await user_exist(message.from_user.id)
+    status = await user_exist(message.from_user.id, token=TOKEN)
     print(status)
     if status == 200:
         await message.answer(f"Вы уже регистрировались!")
@@ -81,7 +81,7 @@ async def process_contact(message: types.Message, state: FSMContext):
     contact = message.contact
     await state.update_data(phone_number=contact.phone_number)
 
-    data = await fetch_place_data()
+    data = await fetch_place_data(TOKEN)
     
     options = [{'name': item['name'], 'callback_data': str(item['id'])} for item in data]
 
@@ -93,7 +93,7 @@ async def process_contact(message: types.Message, state: FSMContext):
 @dp.callback_query(RegistrationStates.place)
 async def callback_query_process_place(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(place=callback_query.data)
-    data = await fetch_rates_data()
+    data = await fetch_rates_data(TOKEN)
 
     options = [{'name': item['rate_name'], 'callback_data': str(item['id'])} for item in data]
 
@@ -116,14 +116,53 @@ async def handle_location(message: types.Message, state: FSMContext):
     longitude = message.location.longitude
 
     await state.update_data(latitude=latitude, longitude=longitude)
+
+    await bot.send_message(message.from_user.id, "Отправьте номер дома:")
+    await state.set_state(RegistrationStates.house)
+
+
+@dp.message(RegistrationStates.house)
+async def process_house(message: types.Message, state: FSMContext):
+    await state.update_data(house_number=message.text)
+    await bot.send_message(message.from_user.id, "Отправьте номер квартиры:")
+    await state.set_state(RegistrationStates.apartment)
+
+
+@dp.message(RegistrationStates.apartment)
+async def process_apartment(message: types.Message, state: FSMContext):
+    await state.update_data(apartment_number=message.text)
+    await bot.send_message(message.from_user.id, "Отправьте номер подьезда:")
+    await state.set_state(RegistrationStates.entrance)
+
+
+@dp.message(RegistrationStates.entrance)
+async def process_entrance(message: types.Message, state: FSMContext):
+    await state.update_data(entrance_number=message.text)
+    await bot.send_message(message.from_user.id, "Отправьте номер этажа:")
+    await state.set_state(RegistrationStates.floor)
+
+
+@dp.message(RegistrationStates.floor)
+async def process_floor(message: types.Message, state: FSMContext):
+    await state.update_data(floor_number=message.text)
+    await bot.send_message(message.from_user.id, "Комментарии к адресу:")
+    await state.set_state(RegistrationStates.comment)
+
+
+@dp.message(RegistrationStates.comment)
+async def process_comment(message: types.Message, state: FSMContext):
+    await state.update_data(comment_to_address=message.text)
+
     context = await state.get_data()
 
-    await post_user_info(data=context)
-
-    # await bot.send_location(message.from_user.id, latitude=latitude, longitude=longitude)
-    
-    await bot.send_message(message.from_user.id, "Спасибо за регистрацию!")
-    await state.clear()
+    try:
+        await post_user_info(data=context, token=TOKEN)
+        
+        await bot.send_message(message.from_user.id, "Спасибо за регистрацию!")
+        await state.clear()
+    except Exception as e:
+        print(e)
+        await bot.send_message(message.from_user.id, "Что-то пошло не так!")
 
 
 async def main():

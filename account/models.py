@@ -27,6 +27,11 @@ class Account(models.Model):
     is_confirm = models.BooleanField(default=False)
     latitude = models.CharField(max_length=200)
     longitude = models.CharField(max_length=200)
+    house_number = models.CharField(max_length=30)
+    apartment_number = models.CharField(max_length=30)
+    entrance_number = models.CharField(max_length=30)
+    floor_number = models.CharField(max_length=30)
+    comment_to_address = models.TextField()
     rate = models.ForeignKey(Rates, on_delete=models.CASCADE, blank=True, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
 

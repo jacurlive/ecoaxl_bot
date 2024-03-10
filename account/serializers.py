@@ -18,9 +18,3 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = "__all__"
-
-
-# class AddressSerializers(serializers.ModelSerializer):
-#     class Meta:
-#         model = Address
-#         fields = "__all__"

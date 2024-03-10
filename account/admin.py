@@ -4,7 +4,8 @@ from .models import Account, Rates, Place
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "latitude", "longitude", "telegram_id", "phone_number", "is_active", "is_confirm", "rate", "place")
+    list_display = ("id", "name", "telegram_id", "phone_number", "is_active", "is_confirm", "rate", "place")
+    list_display_links = ("id", "name", "telegram_id", "phone_number")
 
 
 @admin.register(Rates)
