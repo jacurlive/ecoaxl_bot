@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from states.states import RegistrationStates
-from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist
+from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data
 from keyboards.keyboard import contact_keyboard, confirm_keyboard
 
 
@@ -34,6 +34,8 @@ async def send_rates(chat_id, options):
 
 @dp.message(CommandStart())
 async def start_command(message: types.Message):
+    user_data = await get_user_data(message.from_user.id, token=TOKEN)
+    print(user_data)
     await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/registration - Регистрация\n/help")
 
 
@@ -105,7 +107,7 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
 @dp.callback_query(RegistrationStates.rate)
 async def callback_query_process_rate(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(rate=callback_query.data)
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[types.KeyboardButton(text="Отправить локацию", request_location=True)]])
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[types.KeyboardButton(text="Отправить локацию", request_location=True)]], one_time_keyboard=True)
     await bot.send_message(callback_query.from_user.id, "Отправьте локацию:", reply_markup=keyboard)
     await state.set_state(RegistrationStates.location)
 

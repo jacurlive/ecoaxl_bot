@@ -4,7 +4,7 @@ from aiogram import types
 
 
 contact_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Отправить контакт", request_contact=True)]],
-                                     resize_keyboard=True)
+                                     resize_keyboard=True, one_time_keyboard=True)
 
 
 confirm_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Confirm✅", callback_data="true"), types.InlineKeyboardButton(text="Cancel❌", callback_data="false")]])

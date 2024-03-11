@@ -39,7 +39,6 @@ async def post_user_info(data, token):
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post(url, data=data) as response:
             data = await response.json()
-            print(data)
             return data
         
 
@@ -54,3 +53,17 @@ async def user_exist(telegram_id, token):
         async with session.get(url) as response:
             response_code = response.status
             return response_code
+        
+
+async def get_user_data(telegram_id, token):
+    url = f"{os.environ['API']}account/{telegram_id}"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url) as response:
+            response_data = await response.json()
+
+            return response_data
