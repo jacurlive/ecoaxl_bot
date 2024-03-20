@@ -9,6 +9,7 @@ contact_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(tex
 
 confirm_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Confirm✅", callback_data="true"), types.InlineKeyboardButton(text="Cancel❌", callback_data="false")]])
 
+delete_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Delete Account❌", callback_data="delete")]])
 
 async def send_place(chat_id, options):
     kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options]) # one line button one item 

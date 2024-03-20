@@ -4,8 +4,8 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from .models import Rates, Account, Place
-from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer
+from .models import Rates, Account, Place, Audio
+from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, AudioSerializer
 
 
 load_dotenv()
@@ -57,3 +57,15 @@ class AccountByTelegramIdView(generics.RetrieveUpdateAPIView):  # Изменен
             return Response(serializer.data)
         else:
             return Response({"detail": "Invalid request."}, status=400)
+        
+
+class AccountDeleteAPIView(generics.DestroyAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    permission_classes = [CustomPermission]
+    lookup_field = 'telegram_id'  # Указываем имя поля для поиска в URL
+
+
+class AudioListView(generics.ListAPIView):
+    queryset = Audio.objects.all()
+    serializer_class = AudioSerializer

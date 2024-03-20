@@ -13,4 +13,8 @@ class RegistrationStates(StatesGroup):
     entrance = State()
     floor = State()
     comment = State()
-    
+
+
+class ProfileState(StatesGroup):
+    profile = State()
+    delete = State()

@@ -37,3 +37,11 @@ class Account(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+
+class Audio(models.Model):
+    name = models.CharField(max_length=255)
+    audio_file = models.FileField(upload_to='audio/')
+
+    def __str__(self):
+        return self.name

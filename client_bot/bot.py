@@ -7,9 +7,9 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
-from states.states import RegistrationStates
-from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data
-from keyboards.keyboard import contact_keyboard, confirm_keyboard
+from states.states import RegistrationStates, ProfileState
+from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data
+from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard
 
 
 load_dotenv()
@@ -34,14 +34,30 @@ async def send_rates(chat_id, options):
 
 @dp.message(CommandStart())
 async def start_command(message: types.Message):
-    user_data = await get_user_data(message.from_user.id, token=TOKEN)
-    print(user_data)
     await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/registration - Регистрация\n/help")
 
 
 @dp.message(Command("help"))
 async def help_command(message: types.Message):
     await message.answer(f"/help link to operator")
+
+
+@dp.message(Command("profile"))
+async def profile_command(message: types.Message, state: FSMContext):
+    user_data = await get_user_data(message.from_user.id, token=TOKEN)
+    if user_data != None:
+        await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}", reply_markup=delete_keyboard)
+        await state.set_state(ProfileState.profile)
+    else:
+        await message.answer("вы ещё не регистрировалась")
+
+
+@dp.callback_query(ProfileState.profile)
+async def delete_process(callback_query: types.CallbackQuery, state: FSMContext):
+    callback_data = callback_query.data
+    if callback_data == "delete":
+        delete_data = await delete_user_data(callback_query.from_user.id, token=TOKEN)
+        print(delete_data)
 
 
 @dp.message(Command("registration"))
@@ -58,7 +74,48 @@ async def registration_start(message: types.Message, state: FSMContext):
 @dp.message(RegistrationStates.name)
 async def process_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text, telegram_id=message.from_user.id)
-    await bot.send_message(message.from_user.id, f"Уважаемый {message.text} ... - пользовательское соглашение", reply_markup=confirm_keyboard)
+    await message.answer(
+        """
+<b>Пользовательское соглашение для Telegram бота</b>
+
+Пожалуйста, обратите внимание, что следующее пользовательское соглашение представляет собой общие правила и условия использования Telegram бота, занимающегося коммерцией в сфере услуг. Эти условия описывают взаимоотношения между владельцем бота и его пользователями. Пожалуйста, внимательно прочитайте их перед использованием бота.
+
+<b>1. Предоставление услуг</b>
+   1.1. Владелец бота предлагает услуги через Telegram бота и обязуется предоставлять их в соответствии с описанием услуг, предоставленным в боте.
+   1.2. Владелец бота оставляет за собой право изменять, обновлять или прекращать предоставление любых услуг в любое время без предварительного уведомления пользователя.
+
+<b>2. Ограничение ответственности</b>
+   2.1. Владелец бота не несет ответственности за любые прямые или косвенные убытки, понесенные пользователями в результате использования услуг, предоставляемых ботом.
+   2.2. Владелец бота не несет ответственности за проблемы, возникающие из-за неправильного использования бота или неправильной интерпретации предоставленной информации.
+   2.3. Владелец бота не несет ответственности за любые проблемы, связанные с Telegram платформой или взаимодействием с другими ботами или сторонними сервисами.
+
+<b>3. Конфиденциальность</b>
+   3.1. Владелец бота обязуется обрабатывать персональные данные пользователей в соответствии с применимым законодательством о защите данных.
+   3.2. Владелец бота не будет передавать персональные данные пользователей третьим лицам без их предварительного согласия, за исключением случаев, предусмотренных законодательством.
+
+<b>4. Интеллектуальная собственность</b>
+   4.1. Все права на интеллектуальную собственность, связанную с ботом (включая, но не ограничиваясь, авторскими правами и товарными знаками), принадлежат владельцу бота.
+   4.2. Пользователи не имеют права использовать, копировать, изменять или распространять содержимое бота без предварительного письменного согласия владельца бота.
+
+<b>5. Запрет на злоупотребление</b>
+   5.1. Пользователям запрещено использовать бота для распространения незаконного, вредоносного или оскорбительного содержимого.
+   5.2. Пользователям запрещено использовать бота для осуществления мошенничества, спама или любых других действий, которые могут повредить владельцу бота или другим пользователям.
+
+<b>6. Изменение пользовательского соглашения</b>
+   6.1. Владелец бота оставляет за собой право в любое время изменять условия данного пользовательского соглашения.
+   6.2. Измененное пользовательское соглашение будет опубликовано в боте или предоставлено пользователямв виде уведомления. Пользователи обязуются периодически проверять пользовательское соглашение на наличие изменений.
+
+<b>7. Прекращение использования</b>
+   7.1. Пользователи могут прекратить использование бота в любое время.
+   7.2. Владелец бота оставляет за собой право прекратить предоставление услуг пользователям в случае нарушения пользователем условий данного пользовательского соглашения или в случае несоответствия действиям пользователя законодательству или морально-этическим нормам.
+
+<b>8. Применимое право и разрешение споров</b>
+   8.1. Данное пользовательское соглашение регулируется и толкуется в соответствии с законодательством страны, в которой зарегистрирован владелец бота.
+   8.2. Любые споры, возникающие между владельцем бота и пользователями, будут разрешаться путем переговоров и сотрудничества. В случае невозможности достижения согласия, споры будут переданы на рассмотрение компетентного суда.
+
+Пожалуйста, имейте в виду, что данное пользовательское соглашение является лишь общими правилами и условиями использования бота. Владелец бота может также иметь дополнительные политики и условия, которые могут быть доступны в боте или на его веб-сайте.
+""", reply_markup=confirm_keyboard, parse_mode="html"
+    )
     await state.set_state(RegistrationStates.confirmation)
 
 

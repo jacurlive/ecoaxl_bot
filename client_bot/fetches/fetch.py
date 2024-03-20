@@ -64,6 +64,22 @@ async def get_user_data(telegram_id, token):
 
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(url) as response:
-            response_data = await response.json()
+            if response.status == 200:
+                response_data = await response.json()
+            else:
+                response_data = None
 
             return response_data
+        
+
+async def delete_user_data(telegram_id, token):
+    url = f"{os.environ['API']}account/delete/{telegram_id}"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.delete(url) as response:
+            print(response.status)
+            return response.status
