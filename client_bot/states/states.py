@@ -18,3 +18,7 @@ class RegistrationStates(StatesGroup):
 class ProfileState(StatesGroup):
     profile = State()
     delete = State()
+
+
+class DefaultState(StatesGroup):
+    start = State()

@@ -7,6 +7,9 @@ contact_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(tex
                                      resize_keyboard=True, one_time_keyboard=True)
 
 
+register_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Пройти Регистрацию")]], resize_keyboard=True, one_time_keyboard=True)
+
+
 confirm_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Confirm✅", callback_data="true"), types.InlineKeyboardButton(text="Cancel❌", callback_data="false")]])
 
 delete_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Delete Account❌", callback_data="delete")]])

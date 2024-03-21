@@ -7,9 +7,9 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
-from states.states import RegistrationStates, ProfileState
+from states.states import RegistrationStates, ProfileState, DefaultState
 from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data
-from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard
+from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard
 
 
 load_dotenv()
@@ -33,8 +33,9 @@ async def send_rates(chat_id, options):
 
 
 @dp.message(CommandStart())
-async def start_command(message: types.Message):
-    await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/registration - Регистрация\n/help")
+async def start_command(message: types.Message, state: FSMContext):
+    await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/help\nЧто бы пройти регистрацию нажмите на кнопку", reply_markup=register_keyboard)
+    await state.set_state(DefaultState.start)
 
 
 @dp.message(Command("help"))
@@ -60,15 +61,17 @@ async def delete_process(callback_query: types.CallbackQuery, state: FSMContext)
         print(delete_data)
 
 
-@dp.message(Command("registration"))
+@dp.message(DefaultState.start)
 async def registration_start(message: types.Message, state: FSMContext):
-    status = await user_exist(message.from_user.id, token=TOKEN)
-    print(status)
-    if status == 200:
-        await message.answer(f"Вы уже регистрировались!")
+    if message.text == "Пройти Регистрацию":
+        status = await user_exist(message.from_user.id, token=TOKEN)
+        if status == 200:
+            await message.answer(f"Вы уже регистрировались!")
+        else:
+            await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
+            await state.set_state(RegistrationStates.name)
     else:
-        await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
-        await state.set_state(RegistrationStates.name)
+        await message.answer("Для полной информации введите комманду /help")
 
 
 @dp.message(RegistrationStates.name)
