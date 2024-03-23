@@ -81,5 +81,4 @@ async def delete_user_data(telegram_id, token):
 
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.delete(url) as response:
-            print(response.status)
             return response.status

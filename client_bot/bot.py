@@ -20,16 +20,17 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(bot=bot)
 
 
-async def send_place(chat_id, options):
+async def send_place(message, options):
     kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options]) # one line button one item 
 
-    await bot.send_message(chat_id, "Выберите район:", reply_markup=kb)
+    await bot.send_message(message.from_user.id, "Выберите район:", reply_markup=kb)
 
 
 async def send_rates(chat_id, options):
     kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options], row_width=1)
 
-    await bot.send_message(chat_id, "Выберите тариф:", reply_markup=kb)
+    # await bot.send_message(chat_id.from_user.id, "Выберите тариф:", reply_markup=kb)
+    await bot.edit_message_text("Выберите тариф:", chat_id.message.chat.id, chat_id.message.message_id, reply_markup=kb)
 
 
 @dp.message(CommandStart())
@@ -50,15 +51,28 @@ async def profile_command(message: types.Message, state: FSMContext):
         await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}", reply_markup=delete_keyboard)
         await state.set_state(ProfileState.profile)
     else:
-        await message.answer("вы ещё не регистрировалась")
+        await message.answer("вы ещё не регистрировались")
 
 
 @dp.callback_query(ProfileState.profile)
 async def delete_process(callback_query: types.CallbackQuery, state: FSMContext):
     callback_data = callback_query.data
     if callback_data == "delete":
-        delete_data = await delete_user_data(callback_query.from_user.id, token=TOKEN)
-        print(delete_data)
+        delete_response = await delete_user_data(callback_query.from_user.id, token=TOKEN)
+        if delete_response == 204:
+            await callback_query.message.delete()
+            await bot.send_message(callback_query.from_user.id, "Аккаунт успешно удалён!")
+        else:
+            await bot.send_message(callback_query.from_user.id, "Что-то пошло не так!")
+        await state.clear()
+    elif callback_data == "name":
+        await bot.edit_message_text("Введите имя:", callback_query.message.chat.id, callback_query.message.message_id)
+        await state.set_state(ProfileState.name)
+
+
+@dp.message(ProfileState.name)
+async def name_change_proccess(message: types.Message, state: FSMContext):
+    print(message.text)
 
 
 @dp.message(DefaultState.start)
@@ -147,7 +161,7 @@ async def process_contact(message: types.Message, state: FSMContext):
     
     options = [{'name': item['name'], 'callback_data': str(item['id'])} for item in data]
 
-    await send_place(message.from_user.id, options)
+    await send_place(message, options)
 
     await state.set_state(RegistrationStates.place)
 
@@ -159,7 +173,7 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
 
     options = [{'name': item['rate_name'], 'callback_data': str(item['id'])} for item in data]
 
-    await send_rates(callback_query.from_user.id, options)
+    await send_rates(callback_query, options)
 
     await state.set_state(RegistrationStates.rate)
 
@@ -179,48 +193,67 @@ async def handle_location(message: types.Message, state: FSMContext):
 
     await state.update_data(latitude=latitude, longitude=longitude)
 
-    await bot.send_message(message.from_user.id, "Отправьте номер дома:")
+    message_id = await bot.send_message(message.from_user.id, "Отправьте номер дома:")
+    await state.update_data(message_id=message_id.message_id)
     await state.set_state(RegistrationStates.house)
 
 
 @dp.message(RegistrationStates.house)
 async def process_house(message: types.Message, state: FSMContext):
     await state.update_data(house_number=message.text)
-    await bot.send_message(message.from_user.id, "Отправьте номер квартиры:")
+    await message.delete()
+    data = await state.get_data()
+    message_id = data.get("message_id")
+    message_id = await bot.edit_message_text("Отправьте номер квартиры:", message.chat.id, message_id)
+    await state.update_data(message_id=message_id.message_id)
     await state.set_state(RegistrationStates.apartment)
 
 
 @dp.message(RegistrationStates.apartment)
 async def process_apartment(message: types.Message, state: FSMContext):
     await state.update_data(apartment_number=message.text)
-    await bot.send_message(message.from_user.id, "Отправьте номер подьезда:")
+    await message.delete()
+    data = await state.get_data()
+    message_id = data.get("message_id")
+    message_id = await bot.edit_message_text("Отправьте номер подьезда:", message.chat.id, message_id)
+    await state.update_data(message_id=message_id.message_id)
     await state.set_state(RegistrationStates.entrance)
 
 
 @dp.message(RegistrationStates.entrance)
 async def process_entrance(message: types.Message, state: FSMContext):
     await state.update_data(entrance_number=message.text)
-    await bot.send_message(message.from_user.id, "Отправьте номер этажа:")
+    await message.delete()
+    data = await state.get_data()
+    message_id = data.get("message_id")
+    message_id = await bot.edit_message_text("Отправьте номер этажа:", message.chat.id, message_id)
+    await state.update_data(message_id=message_id.message_id)
     await state.set_state(RegistrationStates.floor)
 
 
 @dp.message(RegistrationStates.floor)
 async def process_floor(message: types.Message, state: FSMContext):
     await state.update_data(floor_number=message.text)
-    await bot.send_message(message.from_user.id, "Комментарии к адресу:")
+    await message.delete()
+    data = await state.get_data()
+    message_id = data.get("message_id")
+    message_id = await bot.edit_message_text("Комментарии к адресу:", message.chat.id, message_id)
+    await state.update_data(message_id=message_id.message_id)
     await state.set_state(RegistrationStates.comment)
 
 
 @dp.message(RegistrationStates.comment)
 async def process_comment(message: types.Message, state: FSMContext):
     await state.update_data(comment_to_address=message.text)
+    await message.delete()
 
     context = await state.get_data()
+    message_id = context.get("message_id")
 
     try:
         await post_user_info(data=context, token=TOKEN)
         
-        await bot.send_message(message.from_user.id, "Спасибо за регистрацию!")
+        await bot.edit_message_text("Спасибо за регистрацию!", message.chat.id, message_id)
         await state.clear()
     except Exception as e:
         print(e)
