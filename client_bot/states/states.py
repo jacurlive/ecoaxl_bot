@@ -8,15 +8,13 @@ class RegistrationStates(StatesGroup):
     place = State()
     rate = State()
     location = State()
-    house = State()
-    apartment = State()
-    entrance = State()
-    floor = State()
+    home = State()
     comment = State()
 
 
 class ProfileState(StatesGroup):
     profile = State()
+    vision = State()
     name = State()
 
 

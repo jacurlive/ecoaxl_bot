@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from states.states import RegistrationStates, ProfileState, DefaultState
 from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data
-from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard
+from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_keyboard
 
 
 load_dotenv()
@@ -29,14 +29,18 @@ async def send_place(message, options):
 async def send_rates(chat_id, options):
     kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options], row_width=1)
 
-    # await bot.send_message(chat_id.from_user.id, "Выберите тариф:", reply_markup=kb)
     await bot.edit_message_text("Выберите тариф:", chat_id.message.chat.id, chat_id.message.message_id, reply_markup=kb)
 
 
 @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
-    await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/help\nЧто бы пройти регистрацию нажмите на кнопку", reply_markup=register_keyboard)
-    await state.set_state(DefaultState.start)
+    user_data = await get_user_data(message.from_user.id, token=TOKEN)
+    if user_data != None:
+        await message.answer("Нажмите на кнопку - Профиль - для полной информации вашего аккаунта", reply_markup=profile_keyboard)
+        await state.set_state(ProfileState.vision)
+    else:
+        await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/help\nЧто бы пройти регистрацию нажмите на кнопку", reply_markup=register_keyboard)
+        await state.set_state(DefaultState.start)
 
 
 @dp.message(Command("help"))
@@ -44,14 +48,17 @@ async def help_command(message: types.Message):
     await message.answer(f"/help link to operator")
 
 
-@dp.message(Command("profile"))
+@dp.message(ProfileState.vision)
 async def profile_command(message: types.Message, state: FSMContext):
-    user_data = await get_user_data(message.from_user.id, token=TOKEN)
-    if user_data != None:
-        await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}", reply_markup=delete_keyboard)
-        await state.set_state(ProfileState.profile)
+    if message.text == "Профиль":
+        user_data = await get_user_data(message.from_user.id, token=TOKEN)
+        if user_data != None:
+            await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}", reply_markup=delete_keyboard)
+            await state.set_state(ProfileState.profile)
+        else:
+            await message.answer("вы ещё не регистрировались")
     else:
-        await message.answer("вы ещё не регистрировались")
+        await message.answer("Нажмите на кнопку")
 
 
 @dp.callback_query(ProfileState.profile)
@@ -139,6 +146,7 @@ async def process_name(message: types.Message, state: FSMContext):
 @dp.callback_query(RegistrationStates.confirmation)
 async def confirmation_query(callback_query: types.CallbackQuery, state: FSMContext):
     confirm_data = callback_query.data
+    await callback_query.message.delete()
 
     if confirm_data == "true":
         await bot.send_message(callback_query.from_user.id, "Отправьте ваш контакт", reply_markup=contact_keyboard)
@@ -181,8 +189,8 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
 @dp.callback_query(RegistrationStates.rate)
 async def callback_query_process_rate(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(rate=callback_query.data)
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[types.KeyboardButton(text="Отправить локацию", request_location=True)]], one_time_keyboard=True)
-    await bot.send_message(callback_query.from_user.id, "Отправьте локацию:", reply_markup=keyboard)
+    await callback_query.message.delete()
+    await bot.send_message(callback_query.from_user.id, "Отправьте локацию:", reply_markup=location_keyboard)
     await state.set_state(RegistrationStates.location)
 
 
@@ -193,53 +201,43 @@ async def handle_location(message: types.Message, state: FSMContext):
 
     await state.update_data(latitude=latitude, longitude=longitude)
 
-    message_id = await bot.send_message(message.from_user.id, "Отправьте номер дома:")
+    message_id = await bot.send_message(message.from_user.id, """
+ввидите ваш адрес в формате :
+
+Дом/кватриру/Подьезд/Этаж
+
+Пример: 30/16/2/1
+                                        """)
     await state.update_data(message_id=message_id.message_id)
-    await state.set_state(RegistrationStates.house)
+    await state.set_state(RegistrationStates.home)
 
 
-@dp.message(RegistrationStates.house)
-async def process_house(message: types.Message, state: FSMContext):
-    await state.update_data(house_number=message.text)
-    await message.delete()
-    data = await state.get_data()
-    message_id = data.get("message_id")
-    message_id = await bot.edit_message_text("Отправьте номер квартиры:", message.chat.id, message_id)
-    await state.update_data(message_id=message_id.message_id)
-    await state.set_state(RegistrationStates.apartment)
+@dp.message(RegistrationStates.home)
+async def process_house_data(message: types.Message, state: FSMContext):
+    try:
+        list_data = message.text.split("/")
+        
+        await state.update_data(house_number=list_data[0], apartment_number=list_data[1], entrance_number=list_data[2], floor_number=list_data[3])
+        await message.delete()
+        
+        data = await state.get_data()
+        
+        message_id = data.get("message_id")
+        message_id = await bot.edit_message_text("Комментарии к адресу:", message.chat.id, message_id)
+        
+        await state.update_data(message_id=message_id.message_id)
+        await state.set_state(RegistrationStates.comment)
+    except IndexError or AttributeError as e:
+        print(e)
+        await bot.send_message(message.from_user.id, "У вас неправильный формат!")
+        message_id = await bot.send_message(message.from_user.id, """
+ввидите ваш адрес в формате :
 
+Дом/кватриру/Подьезд/Этаж
 
-@dp.message(RegistrationStates.apartment)
-async def process_apartment(message: types.Message, state: FSMContext):
-    await state.update_data(apartment_number=message.text)
-    await message.delete()
-    data = await state.get_data()
-    message_id = data.get("message_id")
-    message_id = await bot.edit_message_text("Отправьте номер подьезда:", message.chat.id, message_id)
-    await state.update_data(message_id=message_id.message_id)
-    await state.set_state(RegistrationStates.entrance)
-
-
-@dp.message(RegistrationStates.entrance)
-async def process_entrance(message: types.Message, state: FSMContext):
-    await state.update_data(entrance_number=message.text)
-    await message.delete()
-    data = await state.get_data()
-    message_id = data.get("message_id")
-    message_id = await bot.edit_message_text("Отправьте номер этажа:", message.chat.id, message_id)
-    await state.update_data(message_id=message_id.message_id)
-    await state.set_state(RegistrationStates.floor)
-
-
-@dp.message(RegistrationStates.floor)
-async def process_floor(message: types.Message, state: FSMContext):
-    await state.update_data(floor_number=message.text)
-    await message.delete()
-    data = await state.get_data()
-    message_id = data.get("message_id")
-    message_id = await bot.edit_message_text("Комментарии к адресу:", message.chat.id, message_id)
-    await state.update_data(message_id=message_id.message_id)
-    await state.set_state(RegistrationStates.comment)
+Пример: 30/16/2/1
+    """)
+        await state.update_data(message_id=message_id.message_id)
 
 
 @dp.message(RegistrationStates.comment)
