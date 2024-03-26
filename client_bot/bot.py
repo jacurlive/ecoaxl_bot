@@ -36,10 +36,24 @@ async def send_rates(chat_id, options):
 async def start_command(message: types.Message, state: FSMContext):
     user_data = await get_user_data(message.from_user.id, token=TOKEN)
     if user_data != None:
-        await message.answer("Нажмите на кнопку - Профиль - для полной информации вашего аккаунта", reply_markup=profile_keyboard)
+        await message.answer("""
+Для пользования бота можете использовать следующие комманды:
+
+/start - Для начала использования или для рестарта
+/help - Для помощи
+                             
+Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
+                             """, reply_markup=profile_keyboard)
         await state.set_state(ProfileState.vision)
     else:
-        await message.answer(f"/start (приветствие и общая информация и информация о командах )\n/help\nЧто бы пройти регистрацию нажмите на кнопку", reply_markup=register_keyboard)
+        await message.answer(f"""
+Для пользования бота можете использовать следующие комманды:
+
+/start - Для начала использования или для рестарта
+/help - Для помощи
+                             
+Что бы пройти регистрацию нажмите на кнопку
+                             """, reply_markup=register_keyboard)
         await state.set_state(DefaultState.start)
 
 
@@ -53,7 +67,8 @@ async def profile_command(message: types.Message, state: FSMContext):
     if message.text == "Профиль":
         user_data = await get_user_data(message.from_user.id, token=TOKEN)
         if user_data != None:
-            await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}", reply_markup=delete_keyboard)
+            status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
+            await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}", reply_markup=delete_keyboard)
             await state.set_state(ProfileState.profile)
         else:
             await message.answer("вы ещё не регистрировались")
@@ -61,19 +76,19 @@ async def profile_command(message: types.Message, state: FSMContext):
         await message.answer("Нажмите на кнопку")
 
 
-@dp.callback_query(ProfileState.profile)
-async def delete_process(callback_query: types.CallbackQuery, state: FSMContext):
-    callback_data = callback_query.data
-    if callback_data == "delete":
-        delete_response = await delete_user_data(callback_query.from_user.id, token=TOKEN)
+@dp.message(ProfileState.profile)
+async def delete_process(message: types.Message, state: FSMContext):
+    answer = message.text
+    if answer == "Delete Account❌":
+        delete_response = await delete_user_data(message.from_user.id, token=TOKEN)
         if delete_response == 204:
-            await callback_query.message.delete()
-            await bot.send_message(callback_query.from_user.id, "Аккаунт успешно удалён!")
+            await message.delete()
+            await bot.send_message(message.from_user.id, "Аккаунт успешно удалён!")
         else:
-            await bot.send_message(callback_query.from_user.id, "Что-то пошло не так!")
+            await bot.send_message(message.from_user.id, "Что-то пошло не так!")
         await state.clear()
-    elif callback_data == "name":
-        await bot.edit_message_text("Введите имя:", callback_query.message.chat.id, callback_query.message.message_id)
+    elif answer == "Изменить имя":
+        await bot.edit_message_text("Введите имя:", message.chat.id, message.message_id)
         await state.set_state(ProfileState.name)
 
 
