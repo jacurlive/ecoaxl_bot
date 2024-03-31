@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from states.states import RegistrationStates, ProfileState, DefaultState
 from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data
-from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_keyboard
+from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
 
 
 load_dotenv()
@@ -43,7 +43,7 @@ async def start_command(message: types.Message, state: FSMContext):
 /help - Для помощи
                              
 Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
-                             """, reply_markup=profile_keyboard)
+                             """, reply_markup=profile_view_keyboard)
         await state.set_state(ProfileState.vision)
     else:
         await message.answer(f"""
@@ -79,7 +79,7 @@ async def profile_command(message: types.Message, state: FSMContext):
 @dp.message(ProfileState.profile)
 async def delete_process(message: types.Message, state: FSMContext):
     answer = message.text
-    if answer == "Delete Account❌":
+    if answer == "Удалить аккаунт❌":
         delete_response = await delete_user_data(message.from_user.id, token=TOKEN)
         if delete_response == 204:
             await message.delete()
@@ -87,14 +87,8 @@ async def delete_process(message: types.Message, state: FSMContext):
         else:
             await bot.send_message(message.from_user.id, "Что-то пошло не так!")
         await state.clear()
-    elif answer == "Изменить имя":
-        await bot.edit_message_text("Введите имя:", message.chat.id, message.message_id)
-        await state.set_state(ProfileState.name)
-
-
-@dp.message(ProfileState.name)
-async def name_change_proccess(message: types.Message, state: FSMContext):
-    print(message.text)
+    elif answer == "Редакторовать профиль":
+        await message.answer("Выберите поле которое вы хотите изменить:", reply_markup=profile_column_keyboard)
 
 
 @dp.message(DefaultState.start)
