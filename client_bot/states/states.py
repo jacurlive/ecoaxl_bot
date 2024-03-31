@@ -15,8 +15,9 @@ class RegistrationStates(StatesGroup):
 class ProfileState(StatesGroup):
     profile = State()
     vision = State()
-    name = State()
+    change = State()
+    change_process = State()
 
 
 class DefaultState(StatesGroup):
-    start = State()
+    main = State()

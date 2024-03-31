@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from states.states import RegistrationStates, ProfileState, DefaultState
-from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data
+from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column
 from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
 
 
@@ -44,7 +44,7 @@ async def start_command(message: types.Message, state: FSMContext):
                              
 Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
                              """, reply_markup=profile_view_keyboard)
-        await state.set_state(ProfileState.vision)
+        await state.set_state(DefaultState.main)
     else:
         await message.answer(f"""
 Для пользования бота можете использовать следующие комманды:
@@ -54,7 +54,7 @@ async def start_command(message: types.Message, state: FSMContext):
                              
 Что бы пройти регистрацию нажмите на кнопку
                              """, reply_markup=register_keyboard)
-        await state.set_state(DefaultState.start)
+        await state.set_state(DefaultState.main)
 
 
 @dp.message(Command("help"))
@@ -62,9 +62,10 @@ async def help_command(message: types.Message):
     await message.answer(f"/help link to operator")
 
 
-@dp.message(ProfileState.vision)
-async def profile_command(message: types.Message, state: FSMContext):
-    if message.text == "Профиль":
+@dp.message(DefaultState.main)
+async def registration_start(message: types.Message, state: FSMContext):
+    message_answer = message.text
+    if message_answer == "Профиль":
         user_data = await get_user_data(message.from_user.id, token=TOKEN)
         if user_data != None:
             status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
@@ -72,8 +73,17 @@ async def profile_command(message: types.Message, state: FSMContext):
             await state.set_state(ProfileState.profile)
         else:
             await message.answer("вы ещё не регистрировались")
+    elif message_answer == "Пройти Регистрацию":
+        status = await user_exist(message.from_user.id, token=TOKEN)
+        if status == 200:
+            await message.answer(f"Вы уже регистрировались!")
+        else:
+            await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
+            await state.set_state(RegistrationStates.name)
+    elif message_answer == "Помощь":
+        await message.answer(f"/help link to operator", reply_markup=profile_view_keyboard)
     else:
-        await message.answer("Нажмите на кнопку")
+        await message.answer("Для полной информации введите комманду /help")
 
 
 @dp.message(ProfileState.profile)
@@ -89,19 +99,50 @@ async def delete_process(message: types.Message, state: FSMContext):
         await state.clear()
     elif answer == "Редакторовать профиль":
         await message.answer("Выберите поле которое вы хотите изменить:", reply_markup=profile_column_keyboard)
+        await state.set_state(ProfileState.change)
 
 
-@dp.message(DefaultState.start)
-async def registration_start(message: types.Message, state: FSMContext):
-    if message.text == "Пройти Регистрацию":
-        status = await user_exist(message.from_user.id, token=TOKEN)
-        if status == 200:
-            await message.answer(f"Вы уже регистрировались!")
-        else:
-            await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
-            await state.set_state(RegistrationStates.name)
+@dp.callback_query(ProfileState.change)
+async def change_process(callback_query: types.CallbackQuery, state: FSMContext):
+    callback_data = callback_query.data
+    await state.set_state(ProfileState.change_process)
+    if callback_data == "name":
+        await bot.send_message(callback_query.from_user.id, "Введите новое имя:")
+        await state.update_data(column_name="name")
+    elif callback_data == "house_number":
+        await bot.send_message(callback_query.from_user.id, "Введите номер дома:")
+        await state.update_data(column_name="house_number")
+    elif callback_data == "apartment_number":
+        await bot.send_message(callback_query.from_user.id, "Введите номер квартиры:")
+        await state.update_data(column_name="apartment_number")
+    elif callback_data == "entrance_number":
+        await bot.send_message(callback_query.from_user.id, "Введите номер подьезда:")
+        await state.update_data(column_name="entrance_number")
+    elif callback_data == "floor_number":
+        await bot.send_message(callback_query.from_user.id, "Введите номер этажа:")
+        await state.update_data(column_name="floor_number")
+    elif callback_data == "comment_to_address":
+        await bot.send_message(callback_query.from_user.id, "Введите комментарии к адресу:")
+        await state.update_data(column_name="comment_to_address")
     else:
-        await message.answer("Для полной информации введите комманду /help")
+        await bot.send_message(callback_query.from_user.id, "Что-то пошло не так!", reply_markup=profile_view_keyboard)
+
+
+@dp.message(ProfileState.change_process)
+async def name_change_process(message: types.Message, state: FSMContext):
+    new_name = message.text
+    callback_context = await state.get_data()
+    column_name = callback_context.get("column_name")
+    context = {
+        column_name: new_name
+    }
+    status = await user_change_column(telegram_id=message.from_user.id, data=context, token=TOKEN)
+    if status == 200:
+        await message.answer(f"Данные успешно изменены!", reply_markup=profile_view_keyboard)
+        await state.set_state(DefaultState.main)
+    else:
+        await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+        await state.set_state(DefaultState.main)
 
 
 @dp.message(RegistrationStates.name)

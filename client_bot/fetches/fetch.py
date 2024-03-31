@@ -82,3 +82,16 @@ async def delete_user_data(telegram_id, token):
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.delete(url) as response:
             return response.status
+
+
+async def user_change_column(telegram_id, data, token):
+    url = f"{os.environ['API']}account/{telegram_id}"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.patch(url, data=data) as response:
+            response_code = response.status
+            return response_code
