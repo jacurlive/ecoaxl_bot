@@ -20,7 +20,7 @@ class Place(models.Model):
 class Account(models.Model):
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, blank=True)
-    fathers_name = models.CharField(max_length=255, blank=True)
+    surname = models.CharField(max_length=255, blank=True)
     telegram_id = models.IntegerField()
     phone_number = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
@@ -45,3 +45,15 @@ class Audio(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class WorkerAccount(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
+    telegram_id = models.IntegerField()
+    phone_number = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=False)
+    is_confirm = models.BooleanField(default=False)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
+    

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Rates, Account, Place, Audio
+from .models import Rates, Account, Place, Audio, WorkerAccount
 
 
 class RatesSerializer(serializers.ModelSerializer):
@@ -17,6 +17,12 @@ class PlaceSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
+        fields = "__all__"
+
+
+class WorkerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkerAccount
         fields = "__all__"
 
 

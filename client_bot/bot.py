@@ -57,9 +57,10 @@ async def start_command(message: types.Message, state: FSMContext):
         await state.set_state(DefaultState.main)
 
 
-@dp.message(Command("help"))
-async def help_command(message: types.Message):
-    await message.answer(f"/help link to operator")
+# @dp.message()
+# async def help_command(message: types.Message, state: FSMContext):
+#     await message.answer(f"link to operator", reply_markup=profile_view_keyboard)
+#     await state.set_state(DefaultState.main)
 
 
 @dp.message(DefaultState.main)
@@ -81,7 +82,7 @@ async def registration_start(message: types.Message, state: FSMContext):
             await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
             await state.set_state(RegistrationStates.name)
     elif message_answer == "Помощь":
-        await message.answer(f"/help link to operator", reply_markup=profile_view_keyboard)
+        await message.answer(f"link to operator", reply_markup=profile_view_keyboard)
     else:
         await message.answer("Для полной информации введите комманду /help")
 
@@ -106,6 +107,7 @@ async def delete_process(message: types.Message, state: FSMContext):
 async def change_process(callback_query: types.CallbackQuery, state: FSMContext):
     callback_data = callback_query.data
     await state.set_state(ProfileState.change_process)
+    await callback_query.message.delete()
     if callback_data == "name":
         await bot.send_message(callback_query.from_user.id, "Введите новое имя:")
         await state.update_data(column_name="name")

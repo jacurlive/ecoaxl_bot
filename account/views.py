@@ -4,8 +4,8 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from .models import Rates, Account, Place, Audio
-from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, AudioSerializer
+from .models import Rates, Account, Place, Audio, WorkerAccount
+from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, AudioSerializer, WorkerSerializer
 
 
 load_dotenv()
@@ -26,13 +26,17 @@ class RatesView(generics.ListAPIView):
 class PlaceView(generics.ListAPIView):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
-    permission_classes = [CustomPermission]
 
 
 class AccountCreateView(generics.CreateAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     permission_classes = [CustomPermission]
+
+
+class WorkerCreateView(generics.CreateAPIView):
+    queryset = WorkerAccount.objects.all()
+    serializer_class = WorkerSerializer
 
 
 class AccountByTelegramIdView(generics.RetrieveUpdateAPIView):  # Изменено на RetrieveUpdateAPIView
@@ -46,6 +50,29 @@ class AccountByTelegramIdView(generics.RetrieveUpdateAPIView):  # Изменен
         try:
             account = Account.objects.get(telegram_id=telegram_id)
         except Account.DoesNotExist:
+            return Response({"detail": "User not found."}, status=404)
+
+        # Обновляем значение поля is_confirm
+        is_confirm = request.data.get('is_confirm')
+        if is_confirm is not None:
+            account.is_confirm = is_confirm
+            account.save()
+            serializer = self.get_serializer(account)
+            return Response(serializer.data)
+        else:
+            return Response({"detail": "Invalid request."}, status=400)
+        
+
+class WorkerAccountByTelegramIdView(generics.RetrieveUpdateAPIView):  # Изменено на RetrieveUpdateAPIView
+    queryset = WorkerAccount.objects.all()
+    serializer_class = WorkerSerializer
+    lookup_field = 'telegram_id'  # Указываем имя поля для поиска в URL
+
+    def put(self, request, *args, **kwargs):
+        telegram_id = self.kwargs.get('telegram_id')
+        try:
+            account = WorkerAccount.objects.get(telegram_id=telegram_id)
+        except WorkerAccount.DoesNotExist:
             return Response({"detail": "User not found."}, status=404)
 
         # Обновляем значение поля is_confirm

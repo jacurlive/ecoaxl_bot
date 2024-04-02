@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Account, Rates, Place, Audio
+from .models import Account, Rates, Place, Audio, WorkerAccount
 
 
 @admin.register(Account)
@@ -17,6 +17,12 @@ class RatesAdmin(admin.ModelAdmin):
 @admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
+
+
+@admin.register(WorkerAccount)
+class WorkerAdmin(admin.ModelAdmin):
+    list_display = ("id", "first_name", "last_name", "telegram_id", "phone_number", "is_active", "is_confirm", "place")
+    list_display_links = ("id", "first_name", "last_name", "telegram_id", "phone_number")
 
 
 @admin.register(Audio)
