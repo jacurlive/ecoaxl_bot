@@ -6,7 +6,7 @@ contact_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(tex
 
 location_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Отправить локацию", request_location=True)]], resize_keyboard=True, one_time_keyboard=True)
 
-register_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Пройти Регистрацию")]], resize_keyboard=True, one_time_keyboard=True)
+register_keyboard = types.ReplyKeyboardMarkup(keyboard=[[types.KeyboardButton(text="Пройти Регистрацию")], [types.KeyboardButton(text="Помощь")]], resize_keyboard=True, one_time_keyboard=True)
 
 confirm_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Confirm✅", callback_data="true"), types.InlineKeyboardButton(text="Cancel❌", callback_data="false")]])
 
@@ -23,6 +23,9 @@ delete_kb = [
     [
         types.KeyboardButton(text="Удалить аккаунт❌"),
         types.KeyboardButton(text="Редакторовать профиль")
+    ],
+    [
+        types.KeyboardButton(text="◀️Назад")
     ]
 ]
 

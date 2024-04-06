@@ -74,7 +74,7 @@ async def get_user_data(telegram_id, token):
         
 
 async def delete_user_data(telegram_id, token):
-    url = f"{os.environ['API']}account/delete/{telegram_id}"
+    url = f"{os.environ['API']}worker/delete/{telegram_id}"
 
     headers = {
         'Authorization': token

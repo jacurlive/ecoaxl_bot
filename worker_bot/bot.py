@@ -38,7 +38,6 @@ async def start_command(message: types.Message, state: FSMContext):
                              
 Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
                              """, reply_markup=profile_view_keyboard)
-        await state.set_state(DefaultState.main)
     else:
         await message.answer(f"""
 Для пользования бота можете использовать следующие комманды:
@@ -48,31 +47,6 @@ async def start_command(message: types.Message, state: FSMContext):
                              
 Что бы пройти регистрацию нажмите на кнопку
                              """, reply_markup=register_keyboard)
-        await state.set_state(DefaultState.main)
-
-
-@dp.message(DefaultState.main)
-async def registration_start(message: types.Message, state: FSMContext):
-    message_answer = message.text
-    if message_answer == "Профиль":
-        user_data = await get_user_data(message.from_user.id, token=TOKEN)
-        if user_data != None:
-            status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
-            await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}", reply_markup=delete_keyboard)
-            await state.set_state(ProfileState.profile)
-        else:
-            await message.answer("вы ещё не регистрировались")
-    elif message_answer == "Пройти Регистрацию":
-        status = await user_exist(message.from_user.id, token=TOKEN)
-        if status == 200:
-            await message.answer(f"Вы уже регистрировались!")
-        else:
-            await message.answer(f"Давай начнем процесс регистрации. Введи свое имя в формате:\n\nИмя Фамилия Отчество\n\nЧерез пробел!")
-            await state.set_state(RegistrationStates.name)
-    elif message_answer == "Помощь":
-        await message.answer(f"link to operator", reply_markup=profile_view_keyboard)
-    else:
-        await message.answer("Для полной информации введите комманду /help")
 
 
 @dp.message(RegistrationStates.name)
@@ -141,7 +115,33 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
         print(e)
         await bot.send_message(callback_query.from_user.id, "Что-то пошло не так!", reply_markup=register_keyboard)
     
-    await state.set_state(DefaultState.main)
+    await state.set_state()
+
+
+@dp.message()
+async def registration_start(message: types.Message, state: FSMContext):
+    message_answer = message.text
+    if message_answer == "Профиль":
+        user_data = await get_user_data(message.from_user.id, token=TOKEN)
+        if user_data != None:
+            status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
+            await message.answer(f"Имя: {user_data['first_name']}\nФамилия: {user_data['last_name']}\nОтчество: {user_data['surname']}\nНомер телефона: {user_data['phone_number']}\nСтатус: {status}", reply_markup=delete_keyboard)
+            await state.set_state(ProfileState.profile)
+        else:
+            await message.answer("вы ещё не регистрировались", reply_markup=register_keyboard)
+    elif message_answer == "Пройти Регистрацию":
+        status = await user_exist(message.from_user.id, token=TOKEN)
+        if status == 200:
+            await message.answer(f"Вы уже регистрировались!", reply_markup=profile_view_keyboard)
+        else:
+            await message.answer(f"Давай начнем процесс регистрации. Введи свое имя в формате:\n\nИмя Фамилия Отчество\n\nЧерез пробел!")
+            await state.set_state(RegistrationStates.name)
+    elif message_answer == "Помощь":
+        await message.answer(f"link to operator", reply_markup=profile_view_keyboard)
+    elif message_answer == "Назад":
+        await message.answer(f"Главная менью\n\nВоспользуйтесь кнопками", reply_markup=profile_view_keyboard)
+    else:
+        await message.answer("Для полной информации введите комманду /help")
 
 
 async def main():

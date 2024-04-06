@@ -40,11 +40,10 @@ async def start_command(message: types.Message, state: FSMContext):
 Для пользования бота можете использовать следующие комманды:
 
 /start - Для начала использования или для рестарта
-/help - Для помощи
                              
 Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
+Нажмите на кнопку - Помощь - что бы связаться с администратором
                              """, reply_markup=profile_view_keyboard)
-        await state.set_state(DefaultState.main)
     else:
         await message.answer(f"""
 Для пользования бота можете использовать следующие комманды:
@@ -54,37 +53,7 @@ async def start_command(message: types.Message, state: FSMContext):
                              
 Что бы пройти регистрацию нажмите на кнопку
                              """, reply_markup=register_keyboard)
-        await state.set_state(DefaultState.main)
-
-
-# @dp.message()
-# async def help_command(message: types.Message, state: FSMContext):
-#     await message.answer(f"link to operator", reply_markup=profile_view_keyboard)
-#     await state.set_state(DefaultState.main)
-
-
-@dp.message(DefaultState.main)
-async def registration_start(message: types.Message, state: FSMContext):
-    message_answer = message.text
-    if message_answer == "Профиль":
-        user_data = await get_user_data(message.from_user.id, token=TOKEN)
-        if user_data != None:
-            status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
-            await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}", reply_markup=delete_keyboard)
-            await state.set_state(ProfileState.profile)
-        else:
-            await message.answer("вы ещё не регистрировались")
-    elif message_answer == "Пройти Регистрацию":
-        status = await user_exist(message.from_user.id, token=TOKEN)
-        if status == 200:
-            await message.answer(f"Вы уже регистрировались!")
-        else:
-            await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
-            await state.set_state(RegistrationStates.name)
-    elif message_answer == "Помощь":
-        await message.answer(f"link to operator", reply_markup=profile_view_keyboard)
-    else:
-        await message.answer("Для полной информации введите комманду /help")
+    await state.clear()
 
 
 @dp.message(ProfileState.profile)
@@ -127,7 +96,8 @@ async def change_process(callback_query: types.CallbackQuery, state: FSMContext)
         await bot.send_message(callback_query.from_user.id, "Введите комментарии к адресу:")
         await state.update_data(column_name="comment_to_address")
     else:
-        await bot.send_message(callback_query.from_user.id, "Что-то пошло не так!", reply_markup=profile_view_keyboard)
+        await bot.send_message(callback_query.from_user.id, "Нажмите на кнопку", reply_markup=profile_column_keyboard)
+        await state.set_state(ProfileState.change)
 
 
 @dp.message(ProfileState.change_process)
@@ -141,10 +111,10 @@ async def name_change_process(message: types.Message, state: FSMContext):
     status = await user_change_column(telegram_id=message.from_user.id, data=context, token=TOKEN)
     if status == 200:
         await message.answer(f"Данные успешно изменены!", reply_markup=profile_view_keyboard)
-        await state.set_state(DefaultState.main)
+        await state.clear()
     else:
         await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
-        await state.set_state(DefaultState.main)
+        await state.clear()
 
 
 @dp.message(RegistrationStates.name)
@@ -303,11 +273,59 @@ async def process_comment(message: types.Message, state: FSMContext):
     try:
         await post_user_info(data=context, token=TOKEN)
         
-        await bot.edit_message_text("Спасибо за регистрацию!", message.chat.id, message_id)
+        await bot.send_message(message.from_user.id, "Спасибо за регистрацию!", reply_markup=profile_view_keyboard)
         await state.clear()
     except Exception as e:
         print(e)
-        await bot.send_message(message.from_user.id, "Что-то пошло не так!")
+        await bot.send_message(message.from_user.id, "Что-то пошло не так!", reply_markup=register_keyboard)
+
+
+@dp.message()
+async def registration_start(message: types.Message, state: FSMContext):
+    message_answer = message.text
+    if message_answer == "Профиль":
+        user_data = await get_user_data(message.from_user.id, token=TOKEN)
+        if user_data != None:
+            status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
+            await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}", reply_markup=delete_keyboard)
+        else:
+            await message.answer("вы ещё не регистрировались", reply_markup=register_keyboard)
+
+    elif message_answer == "Пройти Регистрацию":
+        status = await user_exist(message.from_user.id, token=TOKEN)
+        if status == 200:
+            await message.answer(f"Вы уже регистрировались!")
+        else:
+            await message.answer(f"Давай начнем процесс регистрации. Введи свое имя:")
+            await state.set_state(RegistrationStates.name)
+
+    elif message_answer == "Помощь":
+        await message.answer(f"link to operator @jacurlive", reply_markup=profile_view_keyboard)
+
+    elif message_answer == "◀️Назад":
+        await message.answer(f"""
+Для пользования бота можете использовать следующие комманды:
+
+/start - Для начала использования или для рестарта
+                             
+Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
+Нажмите на кнопку - Помощь - что бы связаться с администратором
+""", reply_markup=profile_view_keyboard)
+
+    elif message_answer == "Удалить аккаунт❌":
+        delete_response = await delete_user_data(message.from_user.id, token=TOKEN)
+        if delete_response == 204:
+            await message.delete()
+            await bot.send_message(message.from_user.id, "Аккаунт успешно удалён!")
+        else:
+            await bot.send_message(message.from_user.id, "Что-то пошло не так!")
+
+    elif message_answer == "Редакторовать профиль":
+        await message.answer("Выберите поле которое вы хотите изменить:", reply_markup=profile_column_keyboard)
+        await state.set_state(ProfileState.change)
+        
+    else:
+        await message.answer("Для полной информации введите комманду /help")
 
 
 async def main():

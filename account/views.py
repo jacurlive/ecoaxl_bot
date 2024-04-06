@@ -4,8 +4,8 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from .models import Rates, Account, Place, Audio, WorkerAccount
-from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, AudioSerializer, WorkerSerializer
+from .models import Rates, Account, Place, Audio, WorkerAccount, ClientOrder
+from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, AudioSerializer, WorkerSerializer, ClientOrderSerizalizer
 
 
 load_dotenv()
@@ -91,6 +91,11 @@ class AccountDeleteAPIView(generics.DestroyAPIView):
     serializer_class = AccountSerializer
     permission_classes = [CustomPermission]
     lookup_field = 'telegram_id'  # Указываем имя поля для поиска в URL
+
+
+class ClientOrderCreateView(generics.CreateAPIView):
+    queryset = ClientOrder.objects.all()
+    serializer_class = ClientOrderSerizalizer
 
 
 class AudioListView(generics.ListAPIView):
