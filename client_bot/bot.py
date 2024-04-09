@@ -49,9 +49,9 @@ async def start_command(message: types.Message, state: FSMContext):
 Для пользования бота можете использовать следующие комманды:
 
 /start - Для начала использования или для рестарта
-/help - Для помощи
                              
 Что бы пройти регистрацию нажмите на кнопку
+Нажмите на кнопку - Помощь - что бы связаться с администратором
                              """, reply_markup=register_keyboard)
     await state.clear()
 
@@ -172,9 +172,7 @@ async def confirmation_query(callback_query: types.CallbackQuery, state: FSMCont
 
     if confirm_data == "true":
         await bot.send_message(callback_query.from_user.id, "Отправьте ваш контакт", reply_markup=contact_keyboard)
-
         await state.update_data(is_confirm=confirm_data)
-
         await state.set_state(RegistrationStates.phone_number)
 
     else:
