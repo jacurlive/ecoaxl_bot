@@ -1,3 +1,4 @@
+from typing import Iterable
 from django.db import models
 
 
@@ -34,16 +35,14 @@ class Account(models.Model):
     comment_to_address = models.TextField()
     rate = models.ForeignKey(Rates, on_delete=models.CASCADE, blank=True, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
+    rate_count = models.IntegerField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.rate_count:
+            self.rate_count = self.rate.rate_count
+        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.name
-    
-
-class Audio(models.Model):
-    name = models.CharField(max_length=255)
-    audio_file = models.FileField(upload_to='audio/')
-
-    def __str__(self):
         return self.name
     
 
@@ -67,3 +66,14 @@ class ClientOrder(models.Model):
     is_completed = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
+    latitude = models.CharField(max_length=200, blank=True, null=True)
+    longitude = models.CharField(max_length=200, blank=True, null=True)
+
+
+    def save(self, *args, **kwargs):
+        if not self.longitude or not self.latitude:
+            if self.client_id:
+                self.latitude = self.client_id.latitude
+                self.longitude = self.client_id.longitude
+                self.place = self.client_id.place
+        return super().save(*args, **kwargs)

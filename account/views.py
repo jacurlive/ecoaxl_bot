@@ -4,8 +4,8 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from .models import Rates, Account, Place, Audio, WorkerAccount, ClientOrder
-from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, AudioSerializer, WorkerSerializer, ClientOrderSerizalizer
+from .models import Rates, Account, Place, WorkerAccount, ClientOrder
+from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, WorkerSerializer, ClientOrderSerizalizer
 
 
 load_dotenv()
@@ -96,8 +96,3 @@ class AccountDeleteAPIView(generics.DestroyAPIView):
 class ClientOrderCreateView(generics.CreateAPIView):
     queryset = ClientOrder.objects.all()
     serializer_class = ClientOrderSerizalizer
-
-
-class AudioListView(generics.ListAPIView):
-    queryset = Audio.objects.all()
-    serializer_class = AudioSerializer

@@ -4,11 +4,11 @@ import logging
 
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from states.states import RegistrationStates, ProfileState, DefaultState
-from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column
+from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column, create_order
 from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
 
 
@@ -21,7 +21,7 @@ dp = Dispatcher(bot=bot)
 
 
 async def send_place(message, options):
-    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options]) # one line button one item 
+    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options]) 
 
     await bot.send_message(message.from_user.id, "Выберите район:", reply_markup=kb)
 
@@ -305,7 +305,7 @@ async def registration_start(message: types.Message, state: FSMContext):
 Для пользования бота можете использовать следующие комманды:
 
 /start - Для начала использования или для рестарта
-                             
+
 Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
 Нажмите на кнопку - Помощь - что бы связаться с администратором
 """, reply_markup=profile_view_keyboard)
@@ -321,7 +321,25 @@ async def registration_start(message: types.Message, state: FSMContext):
     elif message_answer == "Редакторовать профиль":
         await message.answer("Выберите поле которое вы хотите изменить:", reply_markup=profile_column_keyboard)
         await state.set_state(ProfileState.change)
-        
+
+    elif message_answer == "Создать заказ":
+        user = await get_user_data(message.from_user.id, token=TOKEN)
+        if user != None:
+            new_count = user["rate_count"] - 1
+            context = {
+                "client_id": message.from_user.id
+            }
+            response_code = await create_order(data=context)
+            if response_code == 201:
+                user_context = {
+                    "rate_count": new_count
+                }
+                response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
+                print(response_code)
+                await message.answer("Заказ создан", reply_markup=profile_view_keyboard)
+            else:
+                await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+
     else:
         await message.answer("Для полной информации введите комманду /help")
 

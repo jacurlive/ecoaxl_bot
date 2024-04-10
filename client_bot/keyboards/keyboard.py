@@ -20,6 +20,7 @@ confirm_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyb
 profile_view_kb = [
     [
         types.KeyboardButton(text="Профиль"),
+        types.KeyboardButton(text="Создать заказ"),
         types.KeyboardButton(text="Помощь")
     ]
 ]
