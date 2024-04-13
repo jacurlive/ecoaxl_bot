@@ -35,7 +35,7 @@ class Account(models.Model):
     comment_to_address = models.TextField()
     rate = models.ForeignKey(Rates, on_delete=models.CASCADE, blank=True, null=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
-    rate_count = models.IntegerField(blank=True, null=True)
+    rate_count = models.CharField(max_length=300, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.rate_count:
@@ -44,7 +44,7 @@ class Account(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
+
 
 class WorkerAccount(models.Model):
     first_name = models.CharField(max_length=255)
@@ -68,6 +68,7 @@ class ClientOrder(models.Model):
     place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
     latitude = models.CharField(max_length=200, blank=True, null=True)
     longitude = models.CharField(max_length=200, blank=True, null=True)
+    photo = models.CharField(max_length=300, blank=True, null=True)
 
 
     def save(self, *args, **kwargs):

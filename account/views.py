@@ -93,6 +93,6 @@ class AccountDeleteAPIView(generics.DestroyAPIView):
     lookup_field = 'telegram_id'  # Указываем имя поля для поиска в URL
 
 
-class ClientOrderCreateView(generics.CreateAPIView):
-    queryset = ClientOrder.objects.all()
+class ClientOrderView(generics.ListCreateAPIView):
+    queryset = ClientOrder.objects.filter(is_completed=False)
     serializer_class = ClientOrderSerizalizer

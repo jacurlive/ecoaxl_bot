@@ -21,3 +21,8 @@ class ProfileState(StatesGroup):
 
 class DefaultState(StatesGroup):
     main = State()
+
+
+class OrderCreate(StatesGroup):
+    photo = State()
+    accept = State()

@@ -1,14 +1,16 @@
 import asyncio
 import os
 import logging
+import requests
+import base64
 
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
-from states.states import RegistrationStates, ProfileState, DefaultState
-from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column, create_order
+from states.states import RegistrationStates, ProfileState, OrderCreate
+from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column, create_order, order_exist
 from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
 
 
@@ -35,6 +37,7 @@ async def send_rates(chat_id, options):
 @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
     user_data = await get_user_data(message.from_user.id, token=TOKEN)
+
     if user_data != None:
         await message.answer("""
 Для пользования бота можете использовать следующие комманды:
@@ -278,11 +281,58 @@ async def process_comment(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, "Что-то пошло не так!", reply_markup=register_keyboard)
 
 
+@dp.message(F.photo, OrderCreate.photo)
+async def get_accept_photo_process(message: types.Message, state: FSMContext):
+    photo_data = message.photo[-1]
+    file_id = photo_data.file_id
+    file_info = await bot.get_file(file_id)
+    file_path = file_info.file_path
+
+    file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_path}"
+
+    # Отправляем GET-запрос для загрузки файла
+    response = requests.get(file_url)
+
+    if response.status_code == 200:
+        photo_dir = f"accept/photo/{message.from_user.id}.jpg"
+        # Открываем файл для записи в бинарном режиме и записываем в него содержимое ответа
+        with open(photo_dir, "wb") as file:
+            file.write(response.content)
+        user = await get_user_data(message.from_user.id, token=TOKEN)
+        rate_count = int(user["rate_count"])
+        if user != None:
+            if rate_count < 1:
+                await message.answer("У вас закончились количество заказов, количество оставших заказов - 0")
+                return
+            new_count = rate_count - 1
+            context = {
+                "client_id": message.from_user.id,
+                "photo": photo_dir
+            }
+            response_code = await create_order(data=context)
+            if response_code == 201:
+                user_context = {
+                    "rate_count": str(new_count)
+                }
+                response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
+                if response_code == 200:
+                    await message.answer(f"Заказ создан - ваш остаток заказов: {new_count}", reply_markup=profile_view_keyboard)
+                else:
+                    await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+            else:
+                await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+    else:
+        await message.answer("Ошибка при загрузке фотографии!")
+    
+    await state.clear()
+
+
 @dp.message()
 async def registration_start(message: types.Message, state: FSMContext):
     message_answer = message.text
+    user_data = await get_user_data(message.from_user.id, token=TOKEN)
     if message_answer == "Профиль":
-        user_data = await get_user_data(message.from_user.id, token=TOKEN)
+        
         if user_data != None:
             status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
             await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}", reply_markup=delete_keyboard)
@@ -323,22 +373,16 @@ async def registration_start(message: types.Message, state: FSMContext):
         await state.set_state(ProfileState.change)
 
     elif message_answer == "Создать заказ":
-        user = await get_user_data(message.from_user.id, token=TOKEN)
-        if user != None:
-            new_count = user["rate_count"] - 1
-            context = {
-                "client_id": message.from_user.id
-            }
-            response_code = await create_order(data=context)
-            if response_code == 201:
-                user_context = {
-                    "rate_count": new_count
-                }
-                response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
-                print(response_code)
-                await message.answer("Заказ создан", reply_markup=profile_view_keyboard)
-            else:
-                await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+        order = await order_exist(message.from_user.id)
+        if order == False:
+            rate_count = int(user_data["rate_count"])
+            if rate_count < 1:
+                await message.answer("У вас закончились количество заказов, количество оставших заказов - 0", reply_markup=profile_view_keyboard)
+                return
+            await message.answer("Отправьте фотографию пакетов возле вашей двери, что-бы курьер мог взять именно ваш заказ")
+            await state.set_state(OrderCreate.photo)
+        else:
+            await message.answer("У вас есть не законченный заказ, в ближайшее время наш курьер закончит ваш заказ.Если есть проблемы нажмите на кнопку Помощь", reply_markup=profile_view_keyboard)
 
     else:
         await message.answer("Для полной информации введите комманду /help")

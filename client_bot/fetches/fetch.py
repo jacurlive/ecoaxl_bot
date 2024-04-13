@@ -98,9 +98,21 @@ async def user_change_column(telegram_id, data, token):
         
 
 async def create_order(data):
-    url = f"{os.environ['API']}order/create/"
+    url = f"{os.environ['API']}order/"
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, data=data) as response:
             response_code = response.status
             return response_code
+        
+
+async def order_exist(telegram_id):
+    url = f"{os.environ['API']}order/"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            response_data = await response.json()
+            for i in response_data:
+                if i["client_id"] == telegram_id:
+                    return True
+            return False
