@@ -21,7 +21,7 @@ class PlaceAdmin(admin.ModelAdmin):
 
 @admin.register(WorkerAccount)
 class WorkerAdmin(admin.ModelAdmin):
-    list_display = ("id", "first_name", "last_name", "telegram_id", "phone_number", "is_active", "is_confirm", "place")
+    list_display = ("id", "first_name", "last_name", "telegram_id", "phone_number", "is_active", "is_confirm")
     list_display_links = ("id", "first_name", "last_name", "telegram_id", "phone_number")
 
 

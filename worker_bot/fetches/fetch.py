@@ -14,19 +14,6 @@ async def fetch_place_data(token):
         async with session.get(url) as response:
             data = await response.json()
             return data
-        
-async def fetch_rates_data(token):
-
-    url = f"{os.environ['API']}rates/"
-
-    headers = {
-        'Authorization': token
-    }
-
-    async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.get(url) as response:
-            data = await response.json()
-            return data
 
 
 async def post_user_info(data, token):

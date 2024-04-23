@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from states.states import RegistrationStates, ProfileState, DefaultState
-from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column
+from fetches.fetch import fetch_place_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column
 from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
 
 

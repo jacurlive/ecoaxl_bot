@@ -54,7 +54,6 @@ class WorkerAccount(models.Model):
     phone_number = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
     is_confirm = models.BooleanField(default=False)
-    place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.first_name
