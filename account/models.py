@@ -63,12 +63,12 @@ class ClientOrder(models.Model):
     client_id = models.ForeignKey(Account, to_field='telegram_id', on_delete=models.CASCADE)
     worker_id = models.ForeignKey(WorkerAccount, to_field='telegram_id', on_delete=models.CASCADE, blank=True, null=True)
     is_completed = models.BooleanField(default=False)
+    is_taken = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
     latitude = models.CharField(max_length=200, blank=True, null=True)
     longitude = models.CharField(max_length=200, blank=True, null=True)
     photo = models.CharField(max_length=300, blank=True, null=True)
-
 
     def save(self, *args, **kwargs):
         if not self.longitude or not self.latitude:

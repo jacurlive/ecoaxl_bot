@@ -7,8 +7,8 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
-from states.states import RegistrationStates, ProfileState, DefaultState
-from fetches.fetch import fetch_place_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column
+from states.states import RegistrationStates, ProfileState, DefaultState, OrderState
+from fetches.fetch import fetch_place_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column, get_orders, take_order
 from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
 
 
@@ -24,6 +24,19 @@ async def send_place(message, options):
     kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options]) # one line button one item 
 
     await bot.send_message(message.from_user.id, "Выберите район:", reply_markup=kb)
+
+
+async def send_orders(callback_query, orders):
+    callback_data = int(callback_query.data)
+
+    for order in orders:
+
+        if callback_data == order['place']:
+            order_id = str(order['id'])
+
+            order_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Принять✅", callback_data=order_id)]])
+            await bot.send_location(callback_query.from_user.id, latitude=order['latitude'], longitude=order['longitude'], reply_markup=order_keyboard)
+
 
 
 @dp.message(CommandStart())
@@ -118,6 +131,65 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
     await state.set_state()
 
 
+@dp.callback_query(OrderState.order_view)
+async def order_view_process(callback_query: types.CallbackQuery, state: FSMContext):
+    orders = await get_orders(TOKEN)
+    await send_orders(callback_query=callback_query, orders=orders)
+    await state.set_state(OrderState.order_get)
+
+
+@dp.callback_query(OrderState.order_get)
+async def order_get_process(callback_query: types.CallbackQuery, state: FSMContext):
+    order_id = callback_query.data
+    data = {
+        "worker_id": callback_query.from_user.id,
+        "is_taken": "true"
+    }
+    take = await take_order(order_id=order_id, data=data, token=TOKEN)
+    
+    if take != None:
+        photo = f"../client_bot/{take['photo']}"
+        
+        await bot.send_message(callback_query.from_user.id, "Заказ принят\n\nДанные заказа:")
+        await bot.send_photo(callback_query.from_user.id, photo=types.FSInputFile(photo))
+        await bot.send_location(callback_query.from_user.id, latitude=take['latitude'], longitude=take['longitude'])
+    
+    await state.clear()
+
+
+@dp.callback_query(ProfileState.change)
+async def change_process(callback_query: types.CallbackQuery, state: FSMContext):
+    callback_data = callback_query.data
+    await state.set_state(ProfileState.change_process)
+    await callback_query.message.delete()
+    if callback_data == "name":
+        await bot.send_message(callback_query.from_user.id, "Введите новое имя:")
+        await state.update_data(column_name="first_name")
+    elif callback_data == "last_name":
+        await bot.send_message(callback_query.from_user.id, "Введите Фамилию:")
+        await state.update_data(column_name="last_name")
+    elif callback_data == "surname":
+        await bot.send_message(callback_query.from_user.id, "Введите Отчество:")
+        await state.update_data(column_name="surname")
+
+
+@dp.message(ProfileState.change_process)
+async def name_change_process(message: types.Message, state: FSMContext):
+    new_value = message.text
+    callback_context = await state.get_data()
+    column_name = callback_context.get("column_name")
+    context = {
+        column_name: new_value
+    }
+    status = await user_change_column(telegram_id=message.from_user.id, data=context, token=TOKEN)
+    if status == 200:
+        await message.answer(f"Данные успешно изменены!", reply_markup=profile_view_keyboard)
+        await state.clear()
+    else:
+        await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+        await state.clear()
+
+
 @dp.message()
 async def registration_start(message: types.Message, state: FSMContext):
     message_answer = message.text
@@ -126,7 +198,6 @@ async def registration_start(message: types.Message, state: FSMContext):
         if user_data != None:
             status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
             await message.answer(f"Имя: {user_data['first_name']}\nФамилия: {user_data['last_name']}\nОтчество: {user_data['surname']}\nНомер телефона: {user_data['phone_number']}\nСтатус: {status}", reply_markup=delete_keyboard)
-            await state.set_state(ProfileState.profile)
         else:
             await message.answer("вы ещё не регистрировались", reply_markup=register_keyboard)
     elif message_answer == "Пройти Регистрацию":
@@ -136,9 +207,19 @@ async def registration_start(message: types.Message, state: FSMContext):
         else:
             await message.answer(f"Давай начнем процесс регистрации. Введи свое имя в формате:\n\nИмя Фамилия Отчество\n\nЧерез пробел!")
             await state.set_state(RegistrationStates.name)
+    elif message_answer == "Редакторовать профиль":
+        await message.answer("Выберите поле которое вы хотите изменить:", reply_markup=profile_column_keyboard)
+        await state.set_state(ProfileState.change)
+    elif message_answer == "Взять заказ":
+        data = await fetch_place_data(TOKEN)
+
+        options = [{'name': item['name'], 'callback_data': str(item['id'])} for item in data]
+
+        await send_place(message, options)
+        await state.set_state(OrderState.order_view)
     elif message_answer == "Помощь":
         await message.answer(f"link to operator", reply_markup=profile_view_keyboard)
-    elif message_answer == "Назад":
+    elif message_answer == "◀️Назад":
         await message.answer(f"Главная менью\n\nВоспользуйтесь кнопками", reply_markup=profile_view_keyboard)
     else:
         await message.answer("Для полной информации введите комманду /help")

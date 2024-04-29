@@ -13,6 +13,9 @@ confirm_keyboard = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyb
 profile_view_kb = [
     [
         types.KeyboardButton(text="Профиль"),
+        types.KeyboardButton(text="Взять заказ")
+    ],
+    [
         types.KeyboardButton(text="Помощь")
     ]
 ]
@@ -34,13 +37,8 @@ delete_keyboard = types.ReplyKeyboardMarkup(keyboard=delete_kb, resize_keyboard=
 profile_column_kb = [
     [
         types.InlineKeyboardButton(text="Имя", callback_data="name"),
-        types.InlineKeyboardButton(text="номер дома", callback_data="house_number"),
-        types.InlineKeyboardButton(text="номер квартиры", callback_data="apartment_number"),
-    ],
-    [
-        types.InlineKeyboardButton(text="номер подьезда", callback_data="entrance_number"),
-        types.InlineKeyboardButton(text="этаж", callback_data="floor_number"),
-        types.InlineKeyboardButton(text="комментарии к адресу", callback_data="comment_to_address")
+        types.InlineKeyboardButton(text="Фамилия", callback_data="last_name"),
+        types.InlineKeyboardButton(text="Отчество", callback_data="surname"),
     ]
 ]
 

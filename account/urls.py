@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RatesView, AccountCreateView, PlaceView, AccountByTelegramIdView, AccountDeleteAPIView, WorkerCreateView, WorkerAccountByTelegramIdView, ClientOrderView
+from .views import RatesView, AccountCreateView, PlaceView, AccountByTelegramIdView, AccountDeleteAPIView, WorkerCreateView, WorkerAccountByTelegramIdView, ClientOrderView, ClientOrderByIDView
 
 urlpatterns = [
     path("rates/", RatesView.as_view()),
@@ -10,4 +10,5 @@ urlpatterns = [
     path("worker/", WorkerCreateView.as_view()),
     path("worker/<int:telegram_id>", WorkerAccountByTelegramIdView.as_view()),
     path("order/", ClientOrderView.as_view()),
+    path("order/<int:pk>", ClientOrderByIDView.as_view())
 ]

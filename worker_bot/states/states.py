@@ -8,6 +8,12 @@ class RegistrationStates(StatesGroup):
     place = State()
 
 
+class OrderState(StatesGroup):
+    order_view = State()
+    order_get = State()
+
+
+
 class ProfileState(StatesGroup):
     profile = State()
     vision = State()

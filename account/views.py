@@ -13,8 +13,9 @@ load_dotenv()
 class CustomPermission(BasePermission):
     def has_permission(self, request, view):
         token = request.headers.get('Authorization')
-        base_token = os.environ['TOKEN']
-        return token == base_token
+        base_token_client = os.environ['TOKEN']
+        base_token_worker = os.environ['WORKER-TOKEN']
+        return token == base_token_client or token == base_token_worker
 
 
 class RatesView(generics.ListAPIView):
@@ -94,5 +95,10 @@ class AccountDeleteAPIView(generics.DestroyAPIView):
 
 
 class ClientOrderView(generics.ListCreateAPIView):
-    queryset = ClientOrder.objects.filter(is_completed=False)
+    queryset = ClientOrder.objects.filter(is_completed=False, is_taken=False)
+    serializer_class = ClientOrderSerizalizer
+
+
+class ClientOrderByIDView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ClientOrder.objects.all()
     serializer_class = ClientOrderSerizalizer
