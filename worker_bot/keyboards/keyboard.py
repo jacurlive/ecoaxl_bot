@@ -43,3 +43,11 @@ profile_column_kb = [
 ]
 
 profile_column_keyboard = types.InlineKeyboardMarkup(inline_keyboard=profile_column_kb)
+
+complete_kb = [
+    [
+        types.InlineKeyboardButton(text="Закончить", callback_data="complete")
+    ]
+]
+
+complete_keyboard = types.InlineKeyboardMarkup(inline_keyboard=complete_kb)

@@ -11,6 +11,8 @@ class RegistrationStates(StatesGroup):
 class OrderState(StatesGroup):
     order_view = State()
     order_get = State()
+    order_complete = State()
+    order_accept_photo = State()
 
 
 

@@ -27,6 +27,6 @@ class WorkerAdmin(admin.ModelAdmin):
 
 @admin.register(ClientOrder)
 class ClientOrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "client_id", "worker_id", "photo", "is_completed", "is_taken", "created_date")
+    list_display = ("id", "client_id", "worker_id", "client_photo", "worker_photo", "is_completed", "is_taken", "created_date")
     list_display_links = ("id", "client_id", "worker_id")
     list_editable = ("is_completed", "is_taken")

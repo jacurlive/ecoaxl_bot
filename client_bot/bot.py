@@ -310,7 +310,7 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
             new_count = rate_count - 1
             context = {
                 "client_id": message.from_user.id,
-                "photo": photo_dir
+                "client_photo": photo_dir
             }
             response_code = await create_order(data=context)
             if response_code == 201:

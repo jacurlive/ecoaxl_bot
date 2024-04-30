@@ -68,7 +68,13 @@ class ClientOrder(models.Model):
     place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
     latitude = models.CharField(max_length=200, blank=True, null=True)
     longitude = models.CharField(max_length=200, blank=True, null=True)
-    photo = models.CharField(max_length=300, blank=True, null=True)
+    house_number = models.CharField(max_length=30, blank=True, null=True)
+    apartment_number = models.CharField(max_length=30, blank=True, null=True)
+    entrance_number = models.CharField(max_length=30, blank=True, null=True)
+    floor_number = models.CharField(max_length=30, blank=True, null=True)
+    comment_to_address = models.TextField(blank=True, null=True)
+    client_photo = models.CharField(max_length=300, blank=True, null=True)
+    worker_photo = models.CharField(max_length=300, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.longitude or not self.latitude:
@@ -76,4 +82,10 @@ class ClientOrder(models.Model):
                 self.latitude = self.client_id.latitude
                 self.longitude = self.client_id.longitude
                 self.place = self.client_id.place
+                self.house_number = self.client_id.house_number
+                self.apartment_number = self.client_id.apartment_number
+                self.entrance_number = self.client_id.entrance_number
+                self.floor_number = self.client_id.floor_number
+                self.comment_to_address = self.client_id.comment_to_address
+
         return super().save(*args, **kwargs)

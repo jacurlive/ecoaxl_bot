@@ -1,6 +1,7 @@
 import asyncio
 import os
 import logging
+import requests
 
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
@@ -9,7 +10,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from states.states import RegistrationStates, ProfileState, DefaultState, OrderState
 from fetches.fetch import fetch_place_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column, get_orders, take_order
-from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
+from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, profile_view_keyboard, profile_column_keyboard, complete_keyboard
 
 
 load_dotenv()
@@ -148,13 +149,58 @@ async def order_get_process(callback_query: types.CallbackQuery, state: FSMConte
     take = await take_order(order_id=order_id, data=data, token=TOKEN)
     
     if take != None:
-        photo = f"../client_bot/{take['photo']}"
+        photo = f"../client_bot/{take['client_photo']}"
         
         await bot.send_message(callback_query.from_user.id, "Заказ принят\n\nДанные заказа:")
         await bot.send_photo(callback_query.from_user.id, photo=types.FSInputFile(photo))
         await bot.send_location(callback_query.from_user.id, latitude=take['latitude'], longitude=take['longitude'])
-    
-    await state.clear()
+        await bot.send_message(callback_query.from_user.id, f"Дом: {take['house_number']}\nКвартира: {take['apartment_number']}\nПодъезд: {take['entrance_number']}\nЭтаж: {take['floor_number']}\nКомментарии: {take['comment_to_address']}", reply_markup=complete_keyboard)
+        await state.update_data(order_id=order_id)
+        await state.set_state(OrderState.order_complete)
+
+
+@dp.callback_query(OrderState.order_complete)
+async def order_complete_process(callback_query: types.CallbackQuery, state: FSMContext):
+    callback_data = callback_query.data
+    data = await state.get_data()
+    order_id = data.get("order_id")
+    data = {
+        "is_complete": "true"
+    }
+    if callback_data == "complete":
+        take = await take_order(order_id=order_id, data=data, token=TOKEN)
+        if take != None:
+            await bot.send_message(callback_query.from_user.id, "Отправьте подтверждающую фотографию:")
+            await state.set_state(OrderState.order_accept_photo)
+
+
+@dp.message(F.photo, OrderState.order_accept_photo)
+async def order_accept_process(message: types.Message, state: FSMContext):
+    photo_data = message.photo[-1]
+    file_id = photo_data.file_id
+    file_info = await bot.get_file(file_id)
+    file_path = file_info.file_path
+
+    data = await state.get_data()
+    order_id = data.get("order_id")
+
+    file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_path}"
+
+    response = requests.get(file_url)
+
+    if response.status_code == 200:
+        photo_dir = f"accept/photo/{order_id}-{message.from_user.id}.jpg"
+        # Открываем файл для записи в бинарном режиме и записываем в него содержимое ответа
+        with open(photo_dir, "wb") as file:
+            file.write(response.content)
+        data = {
+            "worker_photo": photo_dir
+        }
+        take = await take_order(order_id=order_id, data=data, token=TOKEN)
+        if take != None:
+            await message.answer("Заказ успешно закрыт")
+    else:
+        await message.answer("Ошибка при загрузке фотографии!")
 
 
 @dp.callback_query(ProfileState.change)
@@ -222,7 +268,7 @@ async def registration_start(message: types.Message, state: FSMContext):
     elif message_answer == "◀️Назад":
         await message.answer(f"Главная менью\n\nВоспользуйтесь кнопками", reply_markup=profile_view_keyboard)
     else:
-        await message.answer("Для полной информации введите комманду /help")
+        await message.answer("Главная менью\n\nВоспользуйтесь кнопками", reply_markup=profile_view_keyboard)
 
 
 async def main():

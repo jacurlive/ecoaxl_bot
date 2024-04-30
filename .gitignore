@@ -141,3 +141,6 @@ dmypy.json
 !**/migrations/__init__.py
 
 **/__pycache__
+
+**/accept/photo/**
+!**/accept/photo
