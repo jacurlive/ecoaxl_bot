@@ -31,7 +31,7 @@ async def post_user_info(data, token):
         
 
 async def user_exist(telegram_id, token):
-    url = f"{os.environ['API']}account/{telegram_id}"
+    url = f"{os.environ['API']}worker/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -61,7 +61,7 @@ async def get_user_data(telegram_id, token):
         
 
 async def delete_user_data(telegram_id, token):
-    url = f"{os.environ['API']}worker/delete/{telegram_id}"
+    url = f"{os.environ['API']}worker/{telegram_id}"
 
     headers = {
         'Authorization': token

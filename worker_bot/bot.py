@@ -165,7 +165,7 @@ async def order_complete_process(callback_query: types.CallbackQuery, state: FSM
     data = await state.get_data()
     order_id = data.get("order_id")
     data = {
-        "is_complete": "true"
+        "is_completed": "true"
     }
     if callback_data == "complete":
         take = await take_order(order_id=order_id, data=data, token=TOKEN)
@@ -256,6 +256,13 @@ async def registration_start(message: types.Message, state: FSMContext):
     elif message_answer == "Редакторовать профиль":
         await message.answer("Выберите поле которое вы хотите изменить:", reply_markup=profile_column_keyboard)
         await state.set_state(ProfileState.change)
+    elif message_answer == "Удалить аккаунт❌":
+        delete_response = await delete_user_data(message.from_user.id, token=TOKEN)
+        if delete_response == 204:
+            await message.delete()
+            await bot.send_message(message.from_user.id, "Аккаунт успешно удалён!")
+        else:
+            await bot.send_message(message.from_user.id, "Что-то пошло не так!")
     elif message_answer == "Взять заказ":
         data = await fetch_place_data(TOKEN)
 

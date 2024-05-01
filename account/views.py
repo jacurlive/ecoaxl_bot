@@ -27,6 +27,7 @@ class RatesView(generics.ListAPIView):
 class PlaceView(generics.ListAPIView):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
+    permission_classes = [CustomPermission]
 
 
 class AccountCreateView(generics.CreateAPIView):
@@ -64,9 +65,10 @@ class AccountByTelegramIdView(generics.RetrieveUpdateAPIView):  # Изменен
             return Response({"detail": "Invalid request."}, status=400)
         
 
-class WorkerAccountByTelegramIdView(generics.RetrieveUpdateAPIView):  # Изменено на RetrieveUpdateAPIView
+class WorkerAccountByTelegramIdView(generics.RetrieveUpdateDestroyAPIView):  # Изменено на RetrieveUpdateDestroyAPIView
     queryset = WorkerAccount.objects.all()
     serializer_class = WorkerSerializer
+    permission_classes = [CustomPermission]
     lookup_field = 'telegram_id'  # Указываем имя поля для поиска в URL
 
     def put(self, request, *args, **kwargs):
@@ -97,8 +99,10 @@ class AccountDeleteAPIView(generics.DestroyAPIView):
 class ClientOrderView(generics.ListCreateAPIView):
     queryset = ClientOrder.objects.filter(is_completed=False, is_taken=False)
     serializer_class = ClientOrderSerizalizer
+    permission_classes = [CustomPermission]
 
 
 class ClientOrderByIDView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ClientOrder.objects.all()
     serializer_class = ClientOrderSerizalizer
+    permission_classes = [CustomPermission]
