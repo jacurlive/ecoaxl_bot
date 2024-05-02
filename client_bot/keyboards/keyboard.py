@@ -22,6 +22,9 @@ profile_view_kb = [
         types.KeyboardButton(text="Профиль"),
         types.KeyboardButton(text="Создать заказ"),
         types.KeyboardButton(text="Помощь")
+    ],
+    [
+        types.KeyboardButton(text="Актуальный заказ")
     ]
 ]
 

@@ -3,6 +3,7 @@ import os
 import logging
 import requests
 
+from datetime import datetime
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
@@ -312,7 +313,7 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
                 "client_id": message.from_user.id,
                 "client_photo": photo_dir
             }
-            response_code = await create_order(data=context)
+            response_code = await create_order(data=context, token=TOKEN)
             if response_code == 201:
                 user_context = {
                     "rate_count": str(new_count)
@@ -376,7 +377,7 @@ async def registration_start(message: types.Message, state: FSMContext):
         await state.set_state(ProfileState.change)
 
     elif message_answer == "Создать заказ":
-        order = await order_exist(message.from_user.id)
+        order = await order_exist(message.from_user.id, token=TOKEN)
         if order == False:
             rate_count = int(user_data["rate_count"])
             if rate_count < 1:
@@ -386,6 +387,20 @@ async def registration_start(message: types.Message, state: FSMContext):
             await state.set_state(OrderCreate.photo)
         else:
             await message.answer("У вас есть не законченный заказ, в ближайшее время наш курьер закончит ваш заказ.Если есть проблемы нажмите на кнопку Помощь", reply_markup=profile_view_keyboard)
+
+    elif message_answer == "Актуальный заказ":
+        order = await order_exist(message.from_user.id, token=TOKEN)
+        if order == False:
+            await message.answer("У вас ещё нет актуальных заказов, нажмите на кнопку Создать заказ", reply_markup=profile_view_keyboard)
+        else:
+            date = order['created_date']
+
+            datetime_object = datetime.fromisoformat(date)
+
+            time_only = datetime_object.strftime("%H:%M")
+
+            status = "Закончен🟢" if order["is_completed"] == True else "Незакончен🔴"
+            await message.answer(f"id: {order['id']}\nСтатус: {status}\nСтатус курьера: {order['is_taken']}\nВремя создания: {time_only}", reply_markup=profile_view_keyboard)
 
     else:
         await message.answer("Для полной информации введите комманду /help")

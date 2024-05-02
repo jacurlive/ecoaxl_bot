@@ -5,10 +5,11 @@ import requests
 
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import CommandStart, Command
+from aiogram.types.web_app_info import WebAppInfo
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
-from states.states import RegistrationStates, ProfileState, DefaultState, OrderState
+from states.states import RegistrationStates, ProfileState, OrderState
 from fetches.fetch import fetch_place_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column, get_orders, take_order
 from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, profile_view_keyboard, profile_column_keyboard, complete_keyboard
 
@@ -40,27 +41,37 @@ async def send_orders(callback_query, orders):
 
 
 
+# @dp.message(CommandStart())
+# async def start_command(message: types.Message, state: FSMContext):
+#     user_data = await get_user_data(message.from_user.id, token=TOKEN)
+#     if user_data != None:
+#         await message.answer("""
+# Для пользования бота можете использовать следующие комманды:
+
+# /start - Для начала использования или для рестарта
+# /help - Для помощи
+                             
+# Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
+#                              """, reply_markup=profile_view_keyboard)
+#     else:
+#         await message.answer(f"""
+# Для пользования бота можете использовать следующие комманды:
+
+# /start - Для начала использования или для рестарта
+# /help - Для помощи
+                             
+# Что бы пройти регистрацию нажмите на кнопку
+#                              """, reply_markup=register_keyboard)
+
 @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
-    user_data = await get_user_data(message.from_user.id, token=TOKEN)
-    if user_data != None:
-        await message.answer("""
-Для пользования бота можете использовать следующие комманды:
-
-/start - Для начала использования или для рестарта
-/help - Для помощи
-                             
-Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
-                             """, reply_markup=profile_view_keyboard)
-    else:
-        await message.answer(f"""
-Для пользования бота можете использовать следующие комманды:
-
-/start - Для начала использования или для рестарта
-/help - Для помощи
-                             
-Что бы пройти регистрацию нажмите на кнопку
-                             """, reply_markup=register_keyboard)
+    kb = [
+        [
+            types.KeyboardButton(text="Open web", web_app=WebAppInfo(url="https://sudoexc.github.io/"))
+        ]
+    ]
+    key = types.ReplyKeyboardMarkup(keyboard=kb)
+    await message.answer("Hello", reply_markup=key)
 
 
 @dp.message(RegistrationStates.name)
@@ -198,7 +209,7 @@ async def order_accept_process(message: types.Message, state: FSMContext):
         }
         take = await take_order(order_id=order_id, data=data, token=TOKEN)
         if take != None:
-            await message.answer("Заказ успешно закрыт")
+            await message.answer("Заказ успешно закрыт", reply_markup=profile_view_keyboard)
     else:
         await message.answer("Ошибка при загрузке фотографии!")
 
