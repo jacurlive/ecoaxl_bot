@@ -4,11 +4,18 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from .models import Rates, Account, Place, WorkerAccount, ClientOrder
-from .serializers import RatesSerializer, AccountSerializer, PlaceSerializer, WorkerSerializer, ClientOrderSerizalizer
-
+from .models import Rates, Account, Place, WorkerAccount, ClientOrder, UserLanguage
+from .serializers import (
+    RatesSerializer,
+    AccountSerializer,
+    PlaceSerializer,
+    WorkerSerializer,
+    ClientOrderSerializer,
+    UserLanguageSerializer
+)
 
 load_dotenv()
+
 
 class CustomPermission(BasePermission):
     def has_permission(self, request, view):
@@ -63,7 +70,7 @@ class AccountByTelegramIdView(generics.RetrieveUpdateAPIView):  # Изменен
             return Response(serializer.data)
         else:
             return Response({"detail": "Invalid request."}, status=400)
-        
+
 
 class WorkerAccountByTelegramIdView(generics.RetrieveUpdateDestroyAPIView):  # Изменено на RetrieveUpdateDestroyAPIView
     queryset = WorkerAccount.objects.all()
@@ -87,7 +94,7 @@ class WorkerAccountByTelegramIdView(generics.RetrieveUpdateDestroyAPIView):  # �
             return Response(serializer.data)
         else:
             return Response({"detail": "Invalid request."}, status=400)
-        
+
 
 class AccountDeleteAPIView(generics.DestroyAPIView):
     queryset = Account.objects.all()
@@ -98,11 +105,17 @@ class AccountDeleteAPIView(generics.DestroyAPIView):
 
 class ClientOrderView(generics.ListCreateAPIView):
     queryset = ClientOrder.objects.filter(is_completed=False, is_taken=False)
-    serializer_class = ClientOrderSerizalizer
+    serializer_class = ClientOrderSerializer
     permission_classes = [CustomPermission]
 
 
 class ClientOrderByIDView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ClientOrder.objects.all()
-    serializer_class = ClientOrderSerizalizer
+    serializer_class = ClientOrderSerializer
+    permission_classes = [CustomPermission]
+
+
+class UserLanguageListAPIView(generics.ListCreateAPIView):
+    queryset = UserLanguage.objects.all()
+    serializer_class = UserLanguageSerializer
     permission_classes = [CustomPermission]

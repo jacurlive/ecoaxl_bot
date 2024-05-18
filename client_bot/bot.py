@@ -9,10 +9,35 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
-from states.states import RegistrationStates, ProfileState, OrderCreate
-from fetches.fetch import fetch_place_data, fetch_rates_data, post_user_info, user_exist, get_user_data, delete_user_data, user_change_column, create_order, order_exist
-from keyboards.keyboard import contact_keyboard, confirm_keyboard, delete_keyboard, register_keyboard, location_keyboard, profile_view_keyboard, profile_column_keyboard
-
+from translation.localization import Localization
+from states.states import (
+    RegistrationStates,
+    ProfileState,
+    OrderCreate
+)
+from fetches.fetch import (
+    fetch_place_data,
+    fetch_rates_data,
+    post_user_info,
+    user_exist,
+    get_user_data,
+    delete_user_data,
+    user_change_column,
+    create_order,
+    order_exist,
+    take_order,
+    post_user_language
+)
+from keyboards.keyboard import (
+    contact_keyboard,
+    confirm_keyboard,
+    delete_keyboard,
+    register_keyboard,
+    location_keyboard,
+    profile_view_keyboard,
+    profile_column_keyboard,
+    language_keyboard
+)
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -21,42 +46,75 @@ TOKEN = os.environ['TOKEN']
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot=bot)
 
-
-async def send_place(message, options):
-    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options]) 
-
-    await bot.send_message(message.from_user.id, "Выберите район:", reply_markup=kb)
+user_language = {}
 
 
-async def send_rates(chat_id, options):
-    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options], row_width=1)
+# Функция для отправки локализованных сообщений
+async def get_localized_message(language, key):
+    translation = Localization.get_translation(language, key)
+    return translation
 
-    await bot.edit_message_text("Выберите тариф:", chat_id.message.chat.id, chat_id.message.message_id, reply_markup=kb)
+
+async def send_place(message, options, language):
+    kb = types.InlineKeyboardMarkup(
+        inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item
+                         in options])
+    localized_message = await get_localized_message(language=language, key="get_place")
+
+    await bot.send_message(message.from_user.id, localized_message, reply_markup=kb)
+
+
+async def send_rates(chat_id, options, language):
+    kb = types.InlineKeyboardMarkup(
+        inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item
+                         in options], row_width=1)
+
+    localized_message = await get_localized_message(language=language, key="get_rate")
+
+    await bot.edit_message_text(localized_message, chat_id.message.chat.id, chat_id.message.message_id, reply_markup=kb)
 
 
 @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
     user_data = await get_user_data(message.from_user.id, token=TOKEN)
 
-    if user_data != None:
-        await message.answer("""
-Для пользования бота можете использовать следующие комманды:
+    if user_data is not None:
 
-/start - Для начала использования или для рестарта
-                             
-Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
-Нажмите на кнопку - Помощь - что бы связаться с администратором
-                             """, reply_markup=profile_view_keyboard)
+        localized_message = await get_localized_message("ru", "greeting_registered")
+        localized_btn_1 = await get_localized_message("ru", "profile_btn")
+        localized_btn_2 = await get_localized_message("ru", "create_order_btn")
+        localized_btn_3 = await get_localized_message("ru", "help_btn")
+        localized_btn_4 = await get_localized_message("ru", "actual_order_btn")
+        profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
+        await message.answer(localized_message, reply_markup=profile_btn)
+        await state.clear()
     else:
-        await message.answer(f"""
-Для пользования бота можете использовать следующие комманды:
+        language_btn = await language_keyboard()
+        welcome_message = await get_localized_message("none", "welcome")
+        await message.answer(welcome_message, reply_markup=language_btn)
+        await state.set_state(RegistrationStates.get_language)
 
-/start - Для начала использования или для рестарта
-                             
-Что бы пройти регистрацию нажмите на кнопку
-Нажмите на кнопку - Помощь - что бы связаться с администратором
-                             """, reply_markup=register_keyboard)
-    await state.clear()
+
+@dp.callback_query(RegistrationStates.get_language)
+async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
+    language_code = callback_query.data
+
+    context = {
+        "telegram_id": callback_query.message.from_user.id,
+        "lang": language_code
+    }
+    post_lang = await post_user_language(data=context, token=TOKEN)
+
+    if post_lang == 201:
+        localized_message = await get_localized_message(language=language_code, key="greeting_not_registered")
+        localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
+        localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
+        register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
+        await callback_query.message.answer(localized_message, reply_markup=register_btn)
+        await state.clear()
+    else:
+        error_message = await get_localized_message("none", "error")
+        await callback_query.message.answer(error_message)
 
 
 @dp.message(ProfileState.profile)
@@ -71,7 +129,22 @@ async def delete_process(message: types.Message, state: FSMContext):
             await bot.send_message(message.from_user.id, "Что-то пошло не так!")
         await state.clear()
     elif answer == "Редакторовать профиль":
-        await message.answer("Выберите поле которое вы хотите изменить:", reply_markup=profile_column_keyboard)
+        localized_message = await get_localized_message("ru", "change_profile")
+        localized_btn_1 = await get_localized_message("ru", "name_btn")
+        localized_btn_2 = await get_localized_message("ru", "house_number_btn")
+        localized_btn_3 = await get_localized_message("ru", "apartment_number_btn")
+        localized_btn_4 = await get_localized_message("ru", "entrance_number_btn")
+        localized_btn_5 = await get_localized_message("ru", "floor_number_btn")
+        localized_btn_6 = await get_localized_message("ru", "comment_btn")
+        profile_column_btn = await profile_column_keyboard(
+            localized_btn_1,
+            localized_btn_2,
+            localized_btn_3,
+            localized_btn_4,
+            localized_btn_5,
+            localized_btn_6
+        )
+        await message.answer(localized_message, reply_markup=profile_column_btn)
         await state.set_state(ProfileState.change)
 
 
@@ -81,25 +154,46 @@ async def change_process(callback_query: types.CallbackQuery, state: FSMContext)
     await state.set_state(ProfileState.change_process)
     await callback_query.message.delete()
     if callback_data == "name":
-        await bot.send_message(callback_query.from_user.id, "Введите новое имя:")
+        localized_message = await get_localized_message("ru", "change_name_message")
+        await bot.send_message(callback_query.from_user.id, localized_message)
         await state.update_data(column_name="name")
     elif callback_data == "house_number":
-        await bot.send_message(callback_query.from_user.id, "Введите номер дома:")
+        localized_message = await get_localized_message("ru", "change_house_message")
+        await bot.send_message(callback_query.from_user.id, localized_message)
         await state.update_data(column_name="house_number")
     elif callback_data == "apartment_number":
-        await bot.send_message(callback_query.from_user.id, "Введите номер квартиры:")
+        localized_message = await get_localized_message("ru", "change_apartment_message")
+        await bot.send_message(callback_query.from_user.id, localized_message)
         await state.update_data(column_name="apartment_number")
     elif callback_data == "entrance_number":
-        await bot.send_message(callback_query.from_user.id, "Введите номер подьезда:")
+        localized_message = await get_localized_message("ru", "change_entrance_message")
+        await bot.send_message(callback_query.from_user.id, localized_message)
         await state.update_data(column_name="entrance_number")
     elif callback_data == "floor_number":
-        await bot.send_message(callback_query.from_user.id, "Введите номер этажа:")
+        localized_message = await get_localized_message("ru", "change_floor_message")
+        await bot.send_message(callback_query.from_user.id, localized_message)
         await state.update_data(column_name="floor_number")
     elif callback_data == "comment_to_address":
-        await bot.send_message(callback_query.from_user.id, "Введите комментарии к адресу:")
+        localized_message = await get_localized_message("ru", "change_comment_message")
+        await bot.send_message(callback_query.from_user.id, localized_message)
         await state.update_data(column_name="comment_to_address")
     else:
-        await bot.send_message(callback_query.from_user.id, "Нажмите на кнопку", reply_markup=profile_column_keyboard)
+        localized_message = await get_localized_message("ru", "error_changing")
+        localized_btn_1 = await get_localized_message("ru", "name_btn")
+        localized_btn_2 = await get_localized_message("ru", "house_number_btn")
+        localized_btn_3 = await get_localized_message("ru", "apartment_number_btn")
+        localized_btn_4 = await get_localized_message("ru", "entrance_number_btn")
+        localized_btn_5 = await get_localized_message("ru", "floor_number_btn")
+        localized_btn_6 = await get_localized_message("ru", "comment_btn")
+        profile_column_btn = await profile_column_keyboard(
+            localized_btn_1,
+            localized_btn_2,
+            localized_btn_3,
+            localized_btn_4,
+            localized_btn_5,
+            localized_btn_6
+        )
+        await bot.send_message(callback_query.from_user.id, localized_message, reply_markup=profile_column_btn)
         await state.set_state(ProfileState.change)
 
 
@@ -112,74 +206,54 @@ async def name_change_process(message: types.Message, state: FSMContext):
         column_name: new_name
     }
     status = await user_change_column(telegram_id=message.from_user.id, data=context, token=TOKEN)
+    localized_btn_1 = await get_localized_message("ru", "profile_btn")
+    localized_btn_2 = await get_localized_message("ru", "create_order_btn")
+    localized_btn_3 = await get_localized_message("ru", "help_btn")
+    localized_btn_4 = await get_localized_message("ru", "actual_order_btn")
+    profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
     if status == 200:
-        await message.answer(f"Данные успешно изменены!", reply_markup=profile_view_keyboard)
+        localized_message = await get_localized_message("ru", "complete_changing")
+        await message.answer(localized_message, reply_markup=profile_btn)
         await state.clear()
     else:
-        await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+        localized_message = await get_localized_message("ru", "error")
+        await message.answer(localized_message, reply_markup=profile_btn)
         await state.clear()
 
 
 @dp.message(RegistrationStates.name)
 async def process_name(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    language_code = data.get("language_code")
+
     try:
+        localized_message = await get_localized_message(language=language_code, key="confirmation")
+        localized_btn_1 = await get_localized_message("ru", "confirm_btn")
+        localized_btn_2 = await get_localized_message("ru", "cancel_btn")
+        confirm_btn = await confirm_keyboard(localized_btn_1, localized_btn_2)
         full_name = message.text.split(" ")
-        await state.update_data(name=full_name[1], last_name=full_name[0], surname=full_name[2], telegram_id=message.from_user.id)
-        await message.answer(
-                """
-<b>Пользовательское соглашение для Telegram бота</b>
-
-Пожалуйста, обратите внимание, что следующее пользовательское соглашение представляет собой общие правила и условия использования Telegram бота, занимающегося коммерцией в сфере услуг. Эти условия описывают взаимоотношения между владельцем бота и его пользователями. Пожалуйста, внимательно прочитайте их перед использованием бота.
-
-<b>1. Предоставление услуг</b>
-        1.1. Владелец бота предлагает услуги через Telegram бота и обязуется предоставлять их в соответствии с описанием услуг, предоставленным в боте.
-        1.2. Владелец бота оставляет за собой право изменять, обновлять или прекращать предоставление любых услуг в любое время без предварительного уведомления пользователя.
-
-<b>2. Ограничение ответственности</b>
-        2.1. Владелец бота не несет ответственности за любые прямые или косвенные убытки, понесенные пользователями в результате использования услуг, предоставляемых ботом.
-        2.2. Владелец бота не несет ответственности за проблемы, возникающие из-за неправильного использования бота или неправильной интерпретации предоставленной информации.
-        2.3. Владелец бота не несет ответственности за любые проблемы, связанные с Telegram платформой или взаимодействием с другими ботами или сторонними сервисами.
-
-<b>3. Конфиденциальность</b>
-        3.1. Владелец бота обязуется обрабатывать персональные данные пользователей в соответствии с применимым законодательством о защите данных.
-        3.2. Владелец бота не будет передавать персональные данные пользователей третьим лицам без их предварительного согласия, за исключением случаев, предусмотренных законодательством.
-
-<b>4. Интеллектуальная собственность</b>
-        4.1. Все права на интеллектуальную собственность, связанную с ботом (включая, но не ограничиваясь, авторскими правами и товарными знаками), принадлежат владельцу бота.
-        4.2. Пользователи не имеют права использовать, копировать, изменять или распространять содержимое бота без предварительного письменного согласия владельца бота.
-
-        <b>5. Запрет на злоупотребление</b>
-        5.1. Пользователям запрещено использовать бота для распространения незаконного, вредоносного или оскорбительного содержимого.
-        5.2. Пользователям запрещено использовать бота для осуществления мошенничества, спама или любых других действий, которые могут повредить владельцу бота или другим пользователям.
-
-<b>6. Изменение пользовательского соглашения</b>
-        6.1. Владелец бота оставляет за собой право в любое время изменять условия данного пользовательского соглашения.
-        6.2. Измененное пользовательское соглашение будет опубликовано в боте или предоставлено пользователямв виде уведомления. Пользователи обязуются периодически проверять пользовательское соглашение на наличие изменений.
-
-<b>7. Прекращение использования</b>
-        7.1. Пользователи могут прекратить использование бота в любое время.
-        7.2. Владелец бота оставляет за собой право прекратить предоставление услуг пользователям в случае нарушения пользователем условий данного пользовательского соглашения или в случае несоответствия действиям пользователя законодательству или морально-этическим нормам.
-
-<b>8. Применимое право и разрешение споров</b>
-        8.1. Данное пользовательское соглашение регулируется и толкуется в соответствии с законодательством страны, в которой зарегистрирован владелец бота.
-        8.2. Любые споры, возникающие между владельцем бота и пользователями, будут разрешаться путем переговоров и сотрудничества. В случае невозможности достижения согласия, споры будут переданы на рассмотрение компетентного суда.
-
-        Пожалуйста, имейте в виду, что данное пользовательское соглашение является лишь общими правилами и условиями использования бота. Владелец бота может также иметь дополнительные политики и условия, которые могут быть доступны в боте или на его веб-сайте.
-        """, reply_markup=confirm_keyboard, parse_mode="html"
-            )
+        await state.update_data(name=full_name[1], last_name=full_name[0], surname=full_name[2],
+                                telegram_id=message.from_user.id)
+        await message.answer(localized_message, reply_markup=confirm_btn, parse_mode="html")
         await state.set_state(RegistrationStates.confirmation)
     except IndexError or AttributeError as e:
-        await bot.send_message(message.from_user.id, "У вас неправильный формат!")
-        await message.answer(f"Введи свое Ф.И.О в формате:\n\nФамилия Имя Отчество\n\nЧерез пробел!")
+        localized_message = await get_localized_message(language=language_code, key="error_name_format")
+        await message.answer(localized_message)
+        print(e)
 
 
 @dp.callback_query(RegistrationStates.confirmation)
 async def confirmation_query(callback_query: types.CallbackQuery, state: FSMContext):
     confirm_data = callback_query.data
     await callback_query.message.delete()
+    data = await state.get_data()
+    language_code = data.get("language_code")
 
     if confirm_data == "true":
-        await bot.send_message(callback_query.from_user.id, "Отправьте ваш контакт", reply_markup=contact_keyboard)
+        localized_btn = await get_localized_message(language=language_code, key="get_contact")
+        contact_btn = await contact_keyboard(localized_btn)
+        localized_message = await get_localized_message(language=language_code, key="get_contact")
+        await bot.send_message(callback_query.from_user.id, localized_message, reply_markup=contact_btn)
         await state.update_data(is_confirm=confirm_data)
         await state.set_state(RegistrationStates.phone_number)
 
@@ -192,12 +266,14 @@ async def confirmation_query(callback_query: types.CallbackQuery, state: FSMCont
 async def process_contact(message: types.Message, state: FSMContext):
     contact = message.contact
     await state.update_data(phone_number=contact.phone_number)
+    data = await state.get_data()
+    language_code = data.get("language_code")
 
-    data = await fetch_place_data(TOKEN)
-    
-    options = [{'name': item['name'], 'callback_data': str(item['id'])} for item in data]
+    place_data = await fetch_place_data(TOKEN)
 
-    await send_place(message, options)
+    options = [{'name': item['name'], 'callback_data': str(item['id'])} for item in place_data]
+
+    await send_place(message, options, language_code)
 
     await state.set_state(RegistrationStates.place)
 
@@ -205,11 +281,14 @@ async def process_contact(message: types.Message, state: FSMContext):
 @dp.callback_query(RegistrationStates.place)
 async def callback_query_process_place(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(place=callback_query.data)
-    data = await fetch_rates_data(TOKEN)
+    data = await state.get_data()
+    language_code = data.get("language_code")
 
-    options = [{'name': item['rate_name'], 'callback_data': str(item['id'])} for item in data]
+    rates_data = await fetch_rates_data(TOKEN)
 
-    await send_rates(callback_query, options)
+    options = [{'name': item['rate_name'], 'callback_data': str(item['id'])} for item in rates_data]
+
+    await send_rates(callback_query, options, language_code)
 
     await state.set_state(RegistrationStates.rate)
 
@@ -218,7 +297,13 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
 async def callback_query_process_rate(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(rate=callback_query.data)
     await callback_query.message.delete()
-    await bot.send_message(callback_query.from_user.id, "Отправьте локацию:", reply_markup=location_keyboard)
+    data = await state.get_data()
+    language_code = data.get("language_code")
+
+    localized_message = await get_localized_message(language=language_code, key="get_location")
+    localized_btn = await get_localized_message(language=language_code, key="get_location_btn")
+    location_btn = await location_keyboard(localized_btn)
+    await bot.send_message(callback_query.from_user.id, localized_message, reply_markup=location_btn)
     await state.set_state(RegistrationStates.location)
 
 
@@ -227,44 +312,40 @@ async def handle_location(message: types.Message, state: FSMContext):
     latitude = message.location.latitude
     longitude = message.location.longitude
 
+    data = await state.get_data()
+    language_code = data.get("language_code")
+
     await state.update_data(latitude=latitude, longitude=longitude)
 
-    message_id = await bot.send_message(message.from_user.id, """
-ввидите ваш адрес в формате :
-
-Дом/кватриру/Подьезд/Этаж
-
-Пример: 30/16/2/1
-                                        """)
+    localized_message = await get_localized_message(language=language_code, key="get_address")
+    message_id = await bot.send_message(message.from_user.id, localized_message)
     await state.update_data(message_id=message_id.message_id)
     await state.set_state(RegistrationStates.home)
 
 
 @dp.message(RegistrationStates.home)
 async def process_house_data(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    language_code = data.get("language_code")
+
     try:
         list_data = message.text.split("/")
-        
-        await state.update_data(house_number=list_data[0], apartment_number=list_data[1], entrance_number=list_data[2], floor_number=list_data[3])
+
+        await state.update_data(house_number=list_data[0], apartment_number=list_data[1], entrance_number=list_data[2],
+                                floor_number=list_data[3])
         await message.delete()
-        
+
         data = await state.get_data()
-        
+        localized_message = await get_localized_message(language=language_code, key="get_comment_to_address")
         message_id = data.get("message_id")
-        message_id = await bot.edit_message_text("Комментарии к адресу:", message.chat.id, message_id)
-        
+        message_id = await bot.edit_message_text(localized_message, message.chat.id, message_id)
+
         await state.update_data(message_id=message_id.message_id)
         await state.set_state(RegistrationStates.comment)
     except IndexError or AttributeError as e:
         print(e)
-        await bot.send_message(message.from_user.id, "У вас неправильный формат!")
-        message_id = await bot.send_message(message.from_user.id, """
-ввидите ваш адрес в формате :
-
-Дом/кватриру/Подьезд/Этаж
-
-Пример: 30/16/2/1
-    """)
+        localized_message = await get_localized_message(language=language_code, key="error_address_format")
+        message_id = await bot.send_message(message.from_user.id, localized_message)
         await state.update_data(message_id=message_id.message_id)
 
 
@@ -273,16 +354,26 @@ async def process_comment(message: types.Message, state: FSMContext):
     await state.update_data(comment_to_address=message.text)
     await message.delete()
 
-    context = await state.get_data()
+    data = await state.get_data()
+    language_code = data.get("language_code")
 
     try:
-        await post_user_info(data=context, token=TOKEN)
-        
-        await bot.send_message(message.from_user.id, "Спасибо за регистрацию!", reply_markup=profile_view_keyboard)
+        await post_user_info(data=data, token=TOKEN)
+        localized_message = await get_localized_message(language=language_code, key="complete_registration")
+        localized_btn_1 = await get_localized_message("ru", "profile_btn")
+        localized_btn_2 = await get_localized_message("ru", "create_order_btn")
+        localized_btn_3 = await get_localized_message("ru", "help_btn")
+        localized_btn_4 = await get_localized_message("ru", "actual_order_btn")
+        profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
+        await bot.send_message(message.from_user.id, localized_message, reply_markup=profile_btn)
         await state.clear()
     except Exception as e:
+        localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
+        localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
+        register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
+        localized_message = await get_localized_message(language=language_code, key="error")
+        await bot.send_message(message.from_user.id, localized_message, reply_markup=register_btn)
         print(e)
-        await bot.send_message(message.from_user.id, "Что-то пошло не так!", reply_markup=register_keyboard)
 
 
 @dp.message(F.photo, OrderCreate.photo)
@@ -294,40 +385,46 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
 
     file_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_path}"
 
+    data = await state.get_data()
+    order_id = data.get("order_id")
+
     # Отправляем GET-запрос для загрузки файла
     response = requests.get(file_url)
 
     if response.status_code == 200:
-        photo_dir = f"accept/photo/{message.from_user.id}.jpg"
+        photo_dir = f"accept/photo/{order_id}-{message.from_user.id}.jpg"
         # Открываем файл для записи в бинарном режиме и записываем в него содержимое ответа
         with open(photo_dir, "wb") as file:
             file.write(response.content)
         user = await get_user_data(message.from_user.id, token=TOKEN)
         rate_count = int(user["rate_count"])
-        if user != None:
+        if user is not None:
             if rate_count < 1:
                 await message.answer("У вас закончились количество заказов, количество оставших заказов - 0")
                 return
             new_count = rate_count - 1
             context = {
-                "client_id": message.from_user.id,
                 "client_photo": photo_dir
             }
-            response_code = await create_order(data=context, token=TOKEN)
-            if response_code == 201:
-                user_context = {
-                    "rate_count": str(new_count)
-                }
-                response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
-                if response_code == 200:
-                    await message.answer(f"Заказ создан - ваш остаток заказов: {new_count}", reply_markup=profile_view_keyboard)
-                else:
-                    await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+            user_context = {
+                "rate_count": str(new_count)
+            }
+            order = await take_order(order_id=order_id, data=context, token=TOKEN)
+            response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
+            localized_btn_1 = await get_localized_message("ru", "profile_btn")
+            localized_btn_2 = await get_localized_message("ru", "create_order_btn")
+            localized_btn_3 = await get_localized_message("ru", "help_btn")
+            localized_btn_4 = await get_localized_message("ru", "actual_order_btn")
+            profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3,
+                                                      localized_btn_4)
+            if order is not None and response_code == 200:
+                await message.answer(f"Заказ создан - ваш остаток заказов: {new_count}",
+                                     reply_markup=profile_btn)
             else:
-                await message.answer("Что-то пошло не так!", reply_markup=profile_view_keyboard)
+                await message.answer("Что-то пошло не так!", reply_markup=profile_btn)
     else:
         await message.answer("Ошибка при загрузке фотографии!")
-    
+
     await state.clear()
 
 
@@ -335,34 +432,41 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
 async def registration_start(message: types.Message, state: FSMContext):
     message_answer = message.text
     user_data = await get_user_data(message.from_user.id, token=TOKEN)
-    if message_answer == "Профиль":
-        
-        if user_data != None:
-            status = "Активен🟢" if user_data["is_active"] == True else "Неактивен🔴"
-            await message.answer(f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}", reply_markup=delete_keyboard)
-        else:
-            await message.answer("вы ещё не регистрировались", reply_markup=register_keyboard)
+    chat_id = message.from_user.id
+    if message_answer == "Профиль" or message_answer == "Profil":
 
-    elif message_answer == "Пройти Регистрацию":
+        if user_data is not None:
+            status = "Активен🟢" if user_data["is_active"] else "Неактивен🔴"
+            await message.answer(
+                f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}",
+                reply_markup=delete_keyboard)
+        else:
+            language_code = user_language.get(chat_id)
+            localized_message = await get_localized_message(language=language_code, key="profile_error")
+            localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
+            localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
+            register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
+            await message.answer(localized_message, reply_markup=register_btn)
+
+    elif message_answer == "Пройти Регистрацию" or message_answer == "Ro'yhatdan o'tish":
         status = await user_exist(message.from_user.id, token=TOKEN)
         if status == 200:
-            await message.answer(f"Вы уже регистрировались!")
+            language_code = user_data.get("language_code")
+            localized_message = await get_localized_message(language=language_code, key="already_registered")
+            await message.answer(localized_message)
         else:
-            await message.answer(f"Давай начнем процесс регистрации. Введи свое Ф.И.О в формате:\n\nФамилия Имя Отчество\n\nЧерез пробел!")
+            language_code = user_language.get(chat_id)
+            localized_message = await get_localized_message(language=language_code, key="get_name")
+            await message.answer(localized_message)
             await state.set_state(RegistrationStates.name)
+            await state.update_data(language_code=language_code)
 
-    elif message_answer == "Помощь":
+    elif message_answer == "Помощь" or message_answer == "Yordam":
         await message.answer(f"link to operator @jacurlive", reply_markup=profile_view_keyboard)
 
     elif message_answer == "◀️Назад":
-        await message.answer(f"""
-Для пользования бота можете использовать следующие комманды:
-
-/start - Для начала использования или для рестарта
-
-Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
-Нажмите на кнопку - Помощь - что бы связаться с администратором
-""", reply_markup=profile_view_keyboard)
+        localized_message = await get_localized_message("ru", "greeting")
+        await message.answer(localized_message, reply_markup=profile_view_keyboard)
 
     elif message_answer == "Удалить аккаунт❌":
         delete_response = await delete_user_data(message.from_user.id, token=TOKEN)
@@ -378,20 +482,37 @@ async def registration_start(message: types.Message, state: FSMContext):
 
     elif message_answer == "Создать заказ":
         order = await order_exist(message.from_user.id, token=TOKEN)
-        if order == False:
+        if not order:
             rate_count = int(user_data["rate_count"])
             if rate_count < 1:
-                await message.answer("У вас закончились количество заказов, количество оставших заказов - 0", reply_markup=profile_view_keyboard)
+                await message.answer("У вас закончились количество заказов, количество оставших заказов - 0",
+                                     reply_markup=profile_view_keyboard)
                 return
-            await message.answer("Отправьте фотографию пакетов возле вашей двери, что-бы курьер мог взять именно ваш заказ")
-            await state.set_state(OrderCreate.photo)
+
+            context = {
+                "client_id": message.from_user.id
+            }
+            order = await create_order(data=context, token=TOKEN)
+
+            if order is not None:
+                await message.answer(
+                    "Отправьте фотографию пакетов возле вашей двери, что-бы курьер мог взять именно ваш заказ")
+                order_id = order['id']
+                await state.update_data(order_id=order_id)
+                await state.set_state(OrderCreate.photo)
+            else:
+                await message.answer("Что-то пошло не так!")
         else:
-            await message.answer("У вас есть не законченный заказ, в ближайшее время наш курьер закончит ваш заказ.Если есть проблемы нажмите на кнопку Помощь", reply_markup=profile_view_keyboard)
+            await message.answer(
+                "У вас есть не законченный заказ, в ближайшее время наш курьер закончит ваш заказ.Если есть проблемы "
+                "нажмите на кнопку Помощь",
+                reply_markup=profile_view_keyboard)
 
     elif message_answer == "Актуальный заказ":
         order = await order_exist(message.from_user.id, token=TOKEN)
-        if order == False:
-            await message.answer("У вас ещё нет актуальных заказов, нажмите на кнопку Создать заказ", reply_markup=profile_view_keyboard)
+        if not order:
+            await message.answer("У вас ещё нет актуальных заказов, нажмите на кнопку Создать заказ",
+                                 reply_markup=profile_view_keyboard)
         else:
             date = order['created_date']
 
@@ -400,7 +521,9 @@ async def registration_start(message: types.Message, state: FSMContext):
             time_only = datetime_object.strftime("%H:%M")
 
             status = "Закончен🟢" if order["is_completed"] == True else "Незакончен🔴"
-            await message.answer(f"id: {order['id']}\nСтатус: {status}\nСтатус курьера: {order['is_taken']}\nВремя создания: {time_only}", reply_markup=profile_view_keyboard)
+            await message.answer(
+                f"id: {order['id']}\nСтатус: {status}\nСтатус курьера: {order['is_taken']}\nВремя создания: {time_only}",
+                reply_markup=profile_view_keyboard)
 
     else:
         await message.answer("Для полной информации введите комманду /help")

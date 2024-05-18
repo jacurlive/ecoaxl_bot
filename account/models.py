@@ -20,8 +20,8 @@ class Place(models.Model):
 
 class Account(models.Model):
     name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255, blank=True)
-    surname = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
     telegram_id = models.IntegerField(unique=True)
     phone_number = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
@@ -89,3 +89,8 @@ class ClientOrder(models.Model):
                 self.comment_to_address = self.client_id.comment_to_address
 
         return super().save(*args, **kwargs)
+
+
+class UserLanguage(models.Model):
+    user_id = models.IntegerField(unique=True)
+    lang = models.CharField(max_length=20)

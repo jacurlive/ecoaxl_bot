@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Rates, Account, Place, WorkerAccount, ClientOrder
+from .models import Rates, Account, Place, WorkerAccount, ClientOrder, UserLanguage
 
 
 class RatesSerializer(serializers.ModelSerializer):
@@ -26,7 +26,13 @@ class WorkerSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ClientOrderSerizalizer(serializers.ModelSerializer):
+class ClientOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientOrder
+        fields = "__all__"
+
+
+class UserLanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserLanguage
         fields = "__all__"
