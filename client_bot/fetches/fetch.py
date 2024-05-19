@@ -157,4 +157,24 @@ async def post_user_language(data, token):
         async with session.post(url=url, data=data) as response:
             response_code = response.status
             data = await response.json()
+            print(response_code)
             return response_code
+
+
+async def user_language(data: None, user_id, token):
+    url = f"{os.environ['API']}account/language/{user_id}"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        if data is not None:
+            async with session.patch(url=url, data=data) as response:
+                response_code = response.status
+                return response_code
+        else:
+            async with session.get(url=url) as response:
+                response_code = response.status
+                data = await response.json()
+                return data

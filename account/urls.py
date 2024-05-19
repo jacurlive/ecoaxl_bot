@@ -9,7 +9,8 @@ from .views import (
     WorkerAccountByTelegramIdView,
     ClientOrderView,
     ClientOrderByIDView,
-    UserLanguageListAPIView
+    UserLanguageListAPIView,
+    UserLanguageDetailAPIView
 )
 
 urlpatterns = [
@@ -22,5 +23,6 @@ urlpatterns = [
     path("worker/<int:telegram_id>", WorkerAccountByTelegramIdView.as_view()),
     path("order/", ClientOrderView.as_view()),
     path("order/<int:pk>", ClientOrderByIDView.as_view()),
-    path("account/language", UserLanguageListAPIView.as_view())
+    path("account/language", UserLanguageListAPIView.as_view()),
+    path("account/language/<int:user_id>", UserLanguageDetailAPIView.as_view())
 ]

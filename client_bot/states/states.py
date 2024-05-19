@@ -2,6 +2,7 @@ from aiogram.filters.state import StatesGroup, State
 
 
 class RegistrationStates(StatesGroup):
+    get_language = State()
     name = State()
     phone_number = State()
     confirmation = State()

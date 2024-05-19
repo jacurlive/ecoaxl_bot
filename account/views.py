@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
@@ -119,3 +119,27 @@ class UserLanguageListAPIView(generics.ListCreateAPIView):
     queryset = UserLanguage.objects.all()
     serializer_class = UserLanguageSerializer
     permission_classes = [CustomPermission]
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get("user_id")
+        language = request.data.get("lang")
+
+        user_language = UserLanguage.objects.filter(user_id=user_id).first()
+
+        if user_language:
+            user_language.lang = language
+            user_language.save()
+            return Response({"detail": "User language updated successfully."}, status=status.HTTP_200_OK)
+        else:
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLanguageDetailAPIView(generics.RetrieveUpdateAPIView):
+    queryset = UserLanguage.objects.all()
+    serializer_class = UserLanguageSerializer
+    permission_classes = [CustomPermission]
+    lookup_field = 'user_id'  # Search field

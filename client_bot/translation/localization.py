@@ -44,7 +44,11 @@ class Localization:
             "error_changing": "error_changing uz",
             "complete_changing": "complete_changing uz",
             "confirm_btn": "confirm_btn uz",
-            "cancel_btn": "cancel_btn uz"
+            "cancel_btn": "cancel_btn uz",
+            "delete_btn": "delete_btn uz",
+            "edit_btn": "edit_btn uz",
+            "back_btn": "back_btn uz",
+            "help_message": "help_message uz"
         },
         'ru': {
             "greeting_registered": """
@@ -182,7 +186,11 @@ class Localization:
             "error_changing": "Нажмите на кнопку",
             "complete_changing": "Данные успешно изменены!",
             "confirm_btn": "Потвердить✅",
-            "cancel_btn": "Отказать❌"
+            "cancel_btn": "Отказать❌",
+            "delete_btn": "Удалить аккаунт❌",
+            "edit_btn": "Редакторовать профиль",
+            "back_btn": "◀️Назад",
+            "help_message": "link to operator @jacurlive"
         }
     }
 
