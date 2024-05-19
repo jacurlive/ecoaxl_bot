@@ -161,7 +161,7 @@ async def post_user_language(data, token):
             return response_code
 
 
-async def user_language(data: None, user_id, token):
+async def user_language(data=None, user_id=None, token=None):
     url = f"{os.environ['API']}account/language/{user_id}"
 
     headers = {
@@ -176,5 +176,6 @@ async def user_language(data: None, user_id, token):
         else:
             async with session.get(url=url) as response:
                 response_code = response.status
-                data = await response.json()
-                return data
+                language_data = await response.json()
+                return language_data
+

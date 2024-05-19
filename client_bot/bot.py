@@ -99,7 +99,7 @@ async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
     language_code = callback_query.data
 
     context = {
-        "user_id": callback_query.message.from_user.id,
+        "user_id": callback_query.from_user.id,
         "lang": language_code
     }
     post_lang = await post_user_language(data=context, token=TOKEN)
@@ -119,7 +119,7 @@ async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
 @dp.message(ProfileState.profile)
 async def delete_process(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    language_data = await user_language(user_id=user_id)
+    language_data = await user_language(user_id=user_id, token=TOKEN)
     language_code = language_data['lang']
     answer = message.text
     if answer == "Удалить аккаунт❌" or answer == "Akkauntni ochirish":
@@ -152,8 +152,8 @@ async def delete_process(message: types.Message, state: FSMContext):
 
 @dp.callback_query(ProfileState.change)
 async def change_process(callback_query: types.CallbackQuery, state: FSMContext):
-    user_id = callback_query.message.from_user.id
-    language_data = await user_language(user_id=user_id)
+    user_id = callback_query.from_user.id
+    language_data = await user_language(user_id=user_id, token=TOKEN)
     language_code = language_data['lang']
     callback_data = callback_query.data
     await state.set_state(ProfileState.change_process)
@@ -205,7 +205,7 @@ async def change_process(callback_query: types.CallbackQuery, state: FSMContext)
 @dp.message(ProfileState.change_process)
 async def name_change_process(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    language_data = await user_language(user_id=user_id)
+    language_data = await user_language(user_id=user_id, token=TOKEN)
     language_code = language_data['lang']
     new_name = message.text
     callback_context = await state.get_data()
@@ -233,7 +233,7 @@ async def name_change_process(message: types.Message, state: FSMContext):
 async def process_name(message: types.Message, state: FSMContext):
     chat_id = message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     try:
@@ -255,10 +255,10 @@ async def process_name(message: types.Message, state: FSMContext):
 @dp.callback_query(RegistrationStates.confirmation)
 async def confirmation_query(callback_query: types.CallbackQuery, state: FSMContext):
     confirm_data = callback_query.data
+    chat_id = callback_query.from_user.id
     await callback_query.message.delete()
-    chat_id = callback_query.message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     if confirm_data == "true":
@@ -280,7 +280,7 @@ async def process_contact(message: types.Message, state: FSMContext):
     await state.update_data(phone_number=contact.phone_number)
     chat_id = message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     place_data = await fetch_place_data(TOKEN)
@@ -295,9 +295,9 @@ async def process_contact(message: types.Message, state: FSMContext):
 @dp.callback_query(RegistrationStates.place)
 async def callback_query_process_place(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(place=callback_query.data)
-    chat_id = callback_query.message.from_user.id
+    chat_id = callback_query.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     rates_data = await fetch_rates_data(TOKEN)
@@ -313,9 +313,9 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
 async def callback_query_process_rate(callback_query: types.CallbackQuery, state: FSMContext):
     await state.update_data(rate=callback_query.data)
     await callback_query.message.delete()
-    chat_id = callback_query.message.from_user.id
+    chat_id = callback_query.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     localized_message = await get_localized_message(language=language_code, key="get_location")
@@ -332,7 +332,7 @@ async def handle_location(message: types.Message, state: FSMContext):
 
     chat_id = message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     await state.update_data(latitude=latitude, longitude=longitude)
@@ -347,7 +347,7 @@ async def handle_location(message: types.Message, state: FSMContext):
 async def process_house_data(message: types.Message, state: FSMContext):
     chat_id = message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     try:
@@ -379,7 +379,7 @@ async def process_comment(message: types.Message, state: FSMContext):
     data = await state.get_data()
     chat_id = message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     try:
@@ -415,7 +415,7 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
 
     chat_id = message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     # Отправляем GET-запрос для загрузки файла
@@ -464,7 +464,7 @@ async def registration_start(message: types.Message, state: FSMContext):
     user_data = await get_user_data(message.from_user.id, token=TOKEN)
     chat_id = message.from_user.id
 
-    language_data = await user_language(user_id=chat_id)
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     localized_btn_1 = await get_localized_message(language_code, "profile_btn")
