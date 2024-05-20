@@ -78,12 +78,15 @@ async def start_command(message: types.Message, state: FSMContext):
     user_data = await get_user_data(message.from_user.id, token=TOKEN)
 
     if user_data is not None:
+        user_id = message.from_user.id
+        language_data = await user_language(user_id=user_id, token=TOKEN)
+        language_code = language_data['lang']
 
-        localized_message = await get_localized_message("ru", "greeting_registered")
-        localized_btn_1 = await get_localized_message("ru", "profile_btn")
-        localized_btn_2 = await get_localized_message("ru", "create_order_btn")
-        localized_btn_3 = await get_localized_message("ru", "help_btn")
-        localized_btn_4 = await get_localized_message("ru", "actual_order_btn")
+        localized_message = await get_localized_message(language_code, "greeting_registered")
+        localized_btn_1 = await get_localized_message(language_code, "profile_btn")
+        localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
+        localized_btn_3 = await get_localized_message(language_code, "help_btn")
+        localized_btn_4 = await get_localized_message(language_code, "actual_order_btn")
         profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
         await message.answer(localized_message, reply_markup=profile_btn)
         await state.clear()
@@ -384,19 +387,19 @@ async def process_comment(message: types.Message, state: FSMContext):
 
     try:
         await post_user_info(data=data, token=TOKEN)
-        localized_message = await get_localized_message(language=language_code, key="complete_registration")
-        localized_btn_1 = await get_localized_message("ru", "profile_btn")
-        localized_btn_2 = await get_localized_message("ru", "create_order_btn")
-        localized_btn_3 = await get_localized_message("ru", "help_btn")
-        localized_btn_4 = await get_localized_message("ru", "actual_order_btn")
+        localized_message = await get_localized_message(language_code, "complete_registration")
+        localized_btn_1 = await get_localized_message(language_code, "profile_btn")
+        localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
+        localized_btn_3 = await get_localized_message(language_code, "help_btn")
+        localized_btn_4 = await get_localized_message(language_code, "actual_order_btn")
         profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
         await bot.send_message(message.from_user.id, localized_message, reply_markup=profile_btn)
         await state.clear()
     except Exception as e:
-        localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
-        localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
+        localized_message_btn_1 = await get_localized_message(language_code, "register_btn")
+        localized_message_btn_2 = await get_localized_message(language_code, "help_btn")
         register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
-        localized_message = await get_localized_message(language=language_code, key="error")
+        localized_message = await get_localized_message(language_code, "error")
         await bot.send_message(message.from_user.id, localized_message, reply_markup=register_btn)
         print(e)
 
@@ -430,7 +433,8 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
         rate_count = int(user["rate_count"])
         if user is not None:
             if rate_count < 1:
-                await message.answer("У вас закончились количество заказов, количество оставших заказов - 0")
+                localized_message = await get_localized_message(language_code, "rate_count_error")
+                await message.answer(localized_message)
                 return
             new_count = rate_count - 1
             context = {
@@ -448,12 +452,15 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
             profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3,
                                                       localized_btn_4)
             if order is not None and response_code == 200:
-                await message.answer(f"Заказ создан - ваш остаток заказов: {new_count}",
+                localized_message = await get_localized_message(language_code, "order_success")
+                await message.answer(f"{localized_message} {new_count}",
                                      reply_markup=profile_btn)
             else:
-                await message.answer("Что-то пошло не так!", reply_markup=profile_btn)
+                localized_message = await get_localized_message(language_code, "error")
+                await message.answer(localized_message, reply_markup=profile_btn)
     else:
-        await message.answer("Ошибка при загрузке фотографии!")
+        localized_message = await get_localized_message(language_code, "photo_load_error")
+        await message.answer(localized_message)
 
     await state.clear()
 
@@ -476,13 +483,23 @@ async def registration_start(message: types.Message, state: FSMContext):
     if message_answer == "Профиль" or message_answer == "Profil":
 
         if user_data is not None:
+            loc_message_1 = await get_localized_message(language_code, "name")
+            loc_message_2 = await get_localized_message(language_code, "phone_number")
+            loc_message_3 = await get_localized_message(language_code, "house_number")
+            loc_message_4 = await get_localized_message(language_code, "apartment_number")
+            loc_message_5 = await get_localized_message(language_code, "entrance_number")
+            loc_message_6 = await get_localized_message(language_code, "floor")
+            loc_message_7 = await get_localized_message(language_code, "comment_to_address")
+            loc_message_8 = await get_localized_message(language_code, "active")
+            loc_message_9 = await get_localized_message(language_code, "not_active")
+            loc_message_10 = await get_localized_message(language_code, "status")
             localized_btn_1 = await get_localized_message(language_code, "delete_btn")
             localized_btn_2 = await get_localized_message(language_code, "edit_btn")
             localized_btn_3 = await get_localized_message(language_code, "back_btn")
             profile_detail_btn = await delete_keyboard(localized_btn_1, localized_btn_2, localized_btn_3)
-            status = "Активен🟢" if user_data["is_active"] else "Неактивен🔴"
+            status = loc_message_8 if user_data["is_active"] else loc_message_9
             await message.answer(
-                f"имя: {user_data['name']}\nномер телефона: {user_data['phone_number']}\nномер дома: {user_data['house_number']}\nномер квартиры: {user_data['apartment_number']}\nномер подьезда: {user_data['entrance_number']}\nэтаж: {user_data['floor_number']}\nкомментарии к адресу: {user_data['comment_to_address']}\nСтатус: {status}",
+                f"{loc_message_1} {user_data['name']}\n{loc_message_2} {user_data['phone_number']}\n{loc_message_3} {user_data['house_number']}\n{loc_message_4} {user_data['apartment_number']}\n{loc_message_5} {user_data['entrance_number']}\n{loc_message_6} {user_data['floor_number']}\n{loc_message_7} {user_data['comment_to_address']}\n{loc_message_10} {status}",
                 reply_markup=profile_detail_btn)
         else:
             localized_message = await get_localized_message(language=language_code, key="profile_error")
@@ -508,16 +525,18 @@ async def registration_start(message: types.Message, state: FSMContext):
         await message.answer(localized_message, reply_markup=profile_btn)
 
     elif message_answer == "◀️Назад":
-        localized_message = await get_localized_message(language_code, "greeting")
+        localized_message = await get_localized_message(language_code, "back_message")
         await message.answer(localized_message, reply_markup=profile_btn)
 
     elif message_answer == "Удалить аккаунт❌":
         delete_response = await delete_user_data(message.from_user.id, token=TOKEN)
         if delete_response == 204:
             await message.delete()
-            await bot.send_message(message.from_user.id, "Аккаунт успешно удалён!")
+            localized_message = await get_localized_message(language_code, "deleted_success")
+            await bot.send_message(message.from_user.id, localized_message)
         else:
-            await bot.send_message(message.from_user.id, "Что-то пошло не так!")
+            localized_message = await get_localized_message(language_code, "error")
+            await bot.send_message(message.from_user.id, localized_message)
 
     elif message_answer == "Редакторовать профиль":
         localized_message = await get_localized_message(language_code, "change_profile")
@@ -543,8 +562,8 @@ async def registration_start(message: types.Message, state: FSMContext):
         if not order:
             rate_count = int(user_data["rate_count"])
             if rate_count < 1:
-                await message.answer("У вас закончились количество заказов, количество оставших заказов - 0",
-                                     reply_markup=profile_btn)
+                localized_message = await get_localized_message(language_code, "rate_count_error")
+                await message.answer(localized_message, reply_markup=profile_btn)
                 return
 
             context = {
@@ -553,38 +572,44 @@ async def registration_start(message: types.Message, state: FSMContext):
             order = await create_order(data=context, token=TOKEN)
 
             if order is not None:
-                await message.answer(
-                    "Отправьте фотографию пакетов возле вашей двери, что-бы курьер мог взять именно ваш заказ")
+                localized_message = await get_localized_message(language_code, "accept_photo")
+                await message.answer(localized_message)
                 order_id = order['id']
                 await state.update_data(order_id=order_id)
                 await state.set_state(OrderCreate.photo)
             else:
-                await message.answer("Что-то пошло не так!")
+                localized_message = await get_localized_message(language_code, "error")
+                await message.answer(localized_message)
         else:
-            await message.answer(
-                "У вас есть не законченный заказ, в ближайшее время наш курьер закончит ваш заказ.Если есть проблемы "
-                "нажмите на кнопку Помощь",
-                reply_markup=profile_btn)
+            localized_message = await get_localized_message(language_code, "not_ended_order_error")
+            await message.answer(localized_message, reply_markup=profile_btn)
 
     elif message_answer == "Актуальный заказ":
         order = await order_exist(message.from_user.id, token=TOKEN)
         if not order:
-            await message.answer("У вас ещё нет актуальных заказов, нажмите на кнопку Создать заказ",
-                                 reply_markup=profile_btn)
+            localized_message = await get_localized_message(language_code, "not_order_error")
+            await message.answer(localized_message, reply_markup=profile_btn)
         else:
+            loc_message_1 = await get_localized_message(language_code, "worker_status")
+            loc_message_2 = await get_localized_message(language_code, "order_created_time")
+            loc_message_3 = await get_localized_message(language_code, "order_end")
+            loc_message_4 = await get_localized_message(language_code, "order_not_end")
+            loc_message_5 = await get_localized_message(language_code, "order_status")
+
             date = order['created_date']
 
             datetime_object = datetime.fromisoformat(date)
 
             time_only = datetime_object.strftime("%H:%M")
 
-            status = "Закончен🟢" if order["is_completed"] == True else "Незакончен🔴"
+            status = loc_message_3 if order["is_completed"] else loc_message_4
             await message.answer(
-                f"id: {order['id']}\nСтатус: {status}\nСтатус курьера: {order['is_taken']}\nВремя создания: {time_only}",
+                f"id: {order['id']}\n{loc_message_5} {status}\n{loc_message_1} {order['is_taken']}\n{loc_message_2} {time_only}",
                 reply_markup=profile_btn)
 
     else:
-        await message.answer("Для полной информации введите комманду /help")
+        localized_message = await get_localized_message(language_code, "default_message")
+        await message.answer(localized_message)
 
 
 async def main():
