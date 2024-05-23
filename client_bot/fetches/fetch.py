@@ -156,8 +156,7 @@ async def post_user_language(data, token):
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post(url=url, data=data) as response:
             response_code = response.status
-            data = await response.json()
-            print(response_code)
+
             return response_code
 
 
@@ -176,6 +175,8 @@ async def user_language(data=None, user_id=None, token=None):
         else:
             async with session.get(url=url) as response:
                 response_code = response.status
-                language_data = await response.json()
-                return language_data
-
+                if response_code == 200:
+                    language_data = await response.json()
+                    return language_data
+                else:
+                    print("123")

@@ -1,6 +1,5 @@
 import django
 import os
-import random
 from faker import Faker
 
 

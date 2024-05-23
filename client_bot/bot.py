@@ -41,7 +41,7 @@ from keyboards.keyboard import (
 )
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, filename="client_log.log")
 
 TOKEN = os.environ['TOKEN']
 bot = Bot(token=TOKEN)
@@ -252,7 +252,7 @@ async def process_name(message: types.Message, state: FSMContext):
     except IndexError or AttributeError as e:
         localized_message = await get_localized_message(language=language_code, key="error_name_format")
         await message.answer(localized_message)
-        print(e)
+        logging.error(e)
 
 
 @dp.callback_query(RegistrationStates.confirmation)
@@ -265,7 +265,7 @@ async def confirmation_query(callback_query: types.CallbackQuery, state: FSMCont
     language_code = language_data['lang']
 
     if confirm_data == "true":
-        localized_btn = await get_localized_message(language=language_code, key="get_contact")
+        localized_btn = await get_localized_message(language=language_code, key="get_contact_btn")
         contact_btn = await contact_keyboard(localized_btn)
         localized_message = await get_localized_message(language=language_code, key="get_contact")
         await bot.send_message(callback_query.from_user.id, localized_message, reply_markup=contact_btn)
@@ -368,10 +368,10 @@ async def process_house_data(message: types.Message, state: FSMContext):
         await state.update_data(message_id=message_id.message_id)
         await state.set_state(RegistrationStates.comment)
     except IndexError or AttributeError as e:
-        print(e)
         localized_message = await get_localized_message(language=language_code, key="error_address_format")
         message_id = await bot.send_message(message.from_user.id, localized_message)
         await state.update_data(message_id=message_id.message_id)
+        logging.error(e)
 
 
 @dp.message(RegistrationStates.comment)
@@ -401,7 +401,7 @@ async def process_comment(message: types.Message, state: FSMContext):
         register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
         localized_message = await get_localized_message(language_code, "error")
         await bot.send_message(message.from_user.id, localized_message, reply_markup=register_btn)
-        print(e)
+        logging.error(e)
 
 
 @dp.message(F.photo, OrderCreate.photo)
@@ -524,11 +524,11 @@ async def registration_start(message: types.Message, state: FSMContext):
         localized_message = await get_localized_message(language_code, "help_message")
         await message.answer(localized_message, reply_markup=profile_btn)
 
-    elif message_answer == "◀️Назад":
+    elif message_answer == "◀️Назад" or message_answer == "◀️Orqaga":
         localized_message = await get_localized_message(language_code, "back_message")
         await message.answer(localized_message, reply_markup=profile_btn)
 
-    elif message_answer == "Удалить аккаунт❌":
+    elif message_answer == "Удалить аккаунт❌" or message_answer == "Akkaunt o'chirish❌":
         delete_response = await delete_user_data(message.from_user.id, token=TOKEN)
         if delete_response == 204:
             await message.delete()
@@ -538,7 +538,7 @@ async def registration_start(message: types.Message, state: FSMContext):
             localized_message = await get_localized_message(language_code, "error")
             await bot.send_message(message.from_user.id, localized_message)
 
-    elif message_answer == "Редакторовать профиль":
+    elif message_answer == "Редакторовать профиль" or message_answer == "Profilni tahrirlash":
         localized_message = await get_localized_message(language_code, "change_profile")
         localized_btn_1 = await get_localized_message(language_code, "name_btn")
         localized_btn_2 = await get_localized_message(language_code, "house_number_btn")
@@ -557,7 +557,7 @@ async def registration_start(message: types.Message, state: FSMContext):
         await message.answer(localized_message, reply_markup=profile_column_btn)
         await state.set_state(ProfileState.change)
 
-    elif message_answer == "Создать заказ":
+    elif message_answer == "Создать заказ" or message_answer == "Buyurtma yaratish":
         order = await order_exist(message.from_user.id, token=TOKEN)
         if not order:
             rate_count = int(user_data["rate_count"])
@@ -584,7 +584,7 @@ async def registration_start(message: types.Message, state: FSMContext):
             localized_message = await get_localized_message(language_code, "not_ended_order_error")
             await message.answer(localized_message, reply_markup=profile_btn)
 
-    elif message_answer == "Актуальный заказ":
+    elif message_answer == "Актуальный заказ" or message_answer == "Joriy buyurtma":
         order = await order_exist(message.from_user.id, token=TOKEN)
         if not order:
             localized_message = await get_localized_message(language_code, "not_order_error")
@@ -618,4 +618,6 @@ async def main():
 
 
 if __name__ == "__main__":
+    logging.info("Start Service")
     asyncio.run(main())
+    logging.info("Stop Service")

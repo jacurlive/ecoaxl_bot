@@ -6,72 +6,168 @@ class Localization:
             "error": "Nimadir notog'ri ketdi. 🇺🇿\n\nЧто-то пошло не так. 🇷🇺"
         },
         'uz': {
-            "greeting_registered": "Assalomu alaykum!registered",
-            "greeting_not_registered": "Assalomu alaykum!NOT registered",
-            "confirmation": "confirmation uz",
-            "get_name": "get full name uz",
-            "get_contact": "get_contact uz",
-            "error_name_format": "error_name_format uz",
-            "get_location": "get_location uz",
-            "get_address": "get_address uz",
-            "get_comment_to_address": "get_comment_to_address uz",
-            "error_address_format": "error_address_format uz",
-            "complete_registration": "complete_registration uz",
-            "error": "error uz",
+            "greeting_registered": """
+Botdan foydalanish uchun quidagi tugmalardan foydalaning:
+
+Profil - profilingiz xaqida malumot
+Yordam - administrator bilan bog'lanish
+            """,
+            "greeting_not_registered": """
+Xayrli kun aziz foydalanuvchi! 
+
+Biz sizga uyingizdan chiqmasdan maishiy chiqindilardan xalos bo'lishga yordam beradigan ECO AXL xizmatini taklif etamiz!
+
+Biz xonadonlar va xususiy uylardan maishiy chiqindilarni olib chiqamiz.
+
+Har qanday obuna uchun siz og'irligi 7 kg gacha bo'lgan 5 tadan ko'p bo'lmagan sumka olishingiz mumkin
+
+
+Bizning xizmatimiz quyidagi toifadagi odamlar uchun javob beradi: 
+
+Ish va band odamlar uchun.  🧑‍💻🧑‍🔧
+
+Geymerlar va uydagilar uchun foydali.🎮
+
+Biz tug'ruq ta'tilidagi onalarga yordam beramiz.👩‍👧‍👦
+
+Katta yoshdagilarga obuna bo'ling🧑‍  👨‍  
+
+Kasal bo'lib ko'chaga chiqmaydiganlar uchun😷
+
+Harakati cheklangan odamlar uchun zarur👨‍  
+            """,
+            "confirmation": """
+<b>Telegram boti uchun foydalanuvchi shartnomasi</b>
+
+Eʼtibor bering, quyidagi foydalanuvchi shartnomasi xizmat koʻrsatish sohasida tijorat bilan shugʻullanuvchi Telegram botidan foydalanishning umumiy shartlari va shartlarini tashkil qiladi. Ushbu shartlar bot egasi va uning foydalanuvchilari o'rtasidagi munosabatlarni tavsiflaydi. Iltimos, botni ishlatishdan oldin ularni diqqat bilan o'qing.
+
+<b>1. Xizmatlar</b>ni taqdim etish
+         1.1. Bot egasi Telegram boti orqali xizmatlarni taklif qiladi va ularni botda taqdim etilgan xizmatlar tavsifiga muvofiq taqdim etish majburiyatini oladi.
+         1.2. Bot egasi istalgan vaqtda foydalanuvchini oldindan ogohlantirmasdan istalgan xizmatlarni o'zgartirish, yangilash yoki to'xtatish huquqini o'zida saqlab qoladi.
+
+<b>2. Mas'uliyatni cheklash</b>
+         2.1. Botning egasi bot tomonidan taqdim etilgan xizmatlardan foydalanish natijasida foydalanuvchilarning bevosita yoki bilvosita zararlari uchun javobgar emas.
+         2.2. Bot egasi botdan noto'g'ri foydalanish yoki taqdim etilgan ma'lumotlarni noto'g'ri talqin qilish natijasida yuzaga keladigan muammolar uchun javobgar emas.
+         2.3. Bot egasi Telegram platformasi yoki boshqa botlar yoki uchinchi tomon xizmatlari bilan o‘zaro aloqalar bilan bog‘liq muammolar uchun javobgar emas.
+
+<b>3. Maxfiylik</b>
+         3.1. Bot egasi foydalanuvchilarning shaxsiy ma'lumotlarini amaldagi ma'lumotlarni himoya qilish qonunlariga muvofiq qayta ishlash majburiyatini oladi.
+         3.2. Bot egasi, qonun hujjatlarida nazarda tutilgan hollar bundan mustasno, foydalanuvchilarning shaxsiy ma'lumotlarini ularning oldindan roziligisiz uchinchi shaxslarga o'tkazmaydi.
+
+<b>4. Intellektual mulk</b>
+         4.1. Bot bilan bog'liq barcha intellektual mulk huquqlari (jumladan, mualliflik huquqlari va savdo belgilari bilan cheklanmagan holda) bot egasiga tegishli.
+         4.2. Foydalanuvchilar bot egasining yozma roziligisiz bot tarkibidan foydalanishi, nusxalashi, o‘zgartirishi yoki tarqatishi mumkin emas.
+
+         <b>5. Suiiste'mol qilishni taqiqlash</b>
+         5.1. Foydalanuvchilarga botdan noqonuniy, zararli yoki haqoratomuz kontentni tarqatish uchun foydalanishi taqiqlanadi.
+         5.2. Foydalanuvchilarga botdan firibgarlik, spam yoki bot egasiga yoki boshqa foydalanuvchilarga zarar yetkazishi mumkin bo‘lgan boshqa harakatlar uchun foydalanishi taqiqlanadi.
+
+<b>6. Foydalanuvchi shartnomasini o'zgartirish</b>
+         6.1. Bot egasi istalgan vaqtda ushbu foydalanuvchi shartnomasi shartlarini o'zgartirish huquqini o'zida saqlab qoladi.
+         6.2. O'zgartirilgan foydalanuvchi shartnomasi botda e'lon qilinadi yoki foydalanuvchilarga bildirishnoma sifatida taqdim etiladi. Foydalanuvchilar vaqti-vaqti bilan foydalanuvchi shartnomasidagi o'zgarishlarni tekshirish majburiyatini oladilar.
+
+<b>7. Foydalanishni tugatish</b>
+         7.1. Foydalanuvchilar istalgan vaqtda botdan foydalanishni to‘xtatishi mumkin.
+         7.2. Agar foydalanuvchi ushbu foydalanuvchi shartnomasi shartlarini buzsa yoki foydalanuvchining harakatlari qonun yoki axloqiy va axloqiy me'yorlarga mos kelmasa, bot egasi foydalanuvchilarga xizmatlar ko'rsatishni to'xtatish huquqini o'zida saqlab qoladi.
+
+<b>8. Amaldagi qonunchilik va nizolarni hal qilish</b>
+         8.1. Ushbu foydalanuvchi shartnomasi bot egasi ro'yxatdan o'tgan mamlakat qonunlariga muvofiq tartibga solinadi va talqin qilinadi.
+         8.2. Bot egasi va foydalanuvchilar o'rtasida yuzaga keladigan har qanday nizolar muzokaralar va hamkorlik orqali hal qilinadi. Agar kelishuvga erishishning iloji bo'lmasa, nizolar vakolatli sudga yuboriladi.
+
+         Shuni yodda tutingki, ushbu foydalanuvchi shartnomasi faqat botdan foydalanishning umumiy qoidalari va shartlaridir. Bot egasi, shuningdek, bot ichida yoki uning veb-saytida mavjud bo'lishi mumkin bo'lgan qo'shimcha siyosat va shartlarga ega bo'lishi mumkin.
+            """,
+            "get_name": "Keling, ro'yxatdan o'tish jarayonini boshlaylik. Toʻliq ismingizni quyidagi formatda kiriting:\n\nFamiliya Ism otasining ismi\n\nBoʻsh joy bilan ajratilgan!",
+            "get_contact": "Kontaktni yuboring.",
+            "error_name_format": "Siz noto'g'ri formatda kiritdingiz❗️\n\nTo'liq ismingizni quidagi formatda kiriting:\n\nFamiliya Ism Ota ismi\n\nBo'sh joy bilan ajratilgan!",
+            "get_location": """
+Joylashuvni yuboring 
+
+Muhim eslatma: Uy manzilingizni ko'rsatishingiz kerak, chunki bu manzilni aniqlash uchun muhim.
+            """,
+            "get_address": """
+manzilingizni quyidagi formatda kiriting:
+
+Uy/kvartira/kirish/qavat
+
+Misol: 30/16/2/1
+            """,
+            "get_comment_to_address": "Manzilga sharhlar:",
+            "error_address_format": """
+Sizning formatingiz noto'g'ri❗️
+
+manzilingizni quyidagi formatda kiriting:
+
+Uy/kvartira/kirish/qavat
+
+Misol: 30/16/2/1
+            """,
+            "complete_registration": "Roʻyxatdan oʻtganingiz uchun tashakkur!",
+            "error": "Nimadir xato ketdi❗️",
             "register_btn": "Ro'yhatdan o'tish",
             "help_btn": "Yordam",
-            "get_location_btn": "get_location_btn uz",
-            "get_place": "get_place uz",
-            "get_rate": "get_rate uz",
-            "already_registered": "already_registered uz",
-            "profile_error": "profile_error uz",
-            "profile_btn": "profile_btn uz",
-            "create_order_btn": "create_order_btn uz",
-            "actual_order_btn": "actual_order_btn uz",
-            "name_btn": "name_btn uz",
-            "house_number_btn": "house_number_btn uz",
-            "apartment_number_btn": "apartment_number_btn uz",
-            "entrance_number_btn": "entrance_number_btn uz",
-            "floor_number_btn": "floor_number_btn uz",
-            "comment_btn": "comment_btn uz",
-            "change_profile": "change_profile uz",
-            "change_name_message": "change_name_message uz",
-            "change_house_message": "change_house_message uz",
-            "change_apartment_message": "change_apartment_message uz",
-            "change_entrance_message": "change_entrance_message uz",
-            "change_floor_message": "change_floor_message uz",
-            "change_comment_message": "change_comment_message uz",
-            "error_changing": "error_changing uz",
-            "complete_changing": "complete_changing uz",
-            "confirm_btn": "confirm_btn uz",
-            "cancel_btn": "cancel_btn uz",
-            "delete_btn": "delete_btn uz",
-            "edit_btn": "edit_btn uz",
-            "back_btn": "back_btn uz",
-            "help_message": "help_message uz",
-            "rate_count_error": "rate_count_error uz",
-            "order_success": "order_success uz",
-            "photo_load_error": "photo_load_error uz",
-            "name": "name uz",
-            "phone_number": "phone_number uz",
-            "house_number": "house_number uz",
-            "apartment_number": "apartment_number uz",
-            "entrance_number": "entrance_number uz",
-            "floor": "floor uz",
-            "comment_to_address": "comment_to_address uz",
-            "active": "active uz",
-            "not_active": "not_active uz",
-            "status": "status uz",
-            "deleted_success": "deleted_success uz",
-            "accept_photo": "accept_photo uz",
-            "not_ended_order_error": "not_ended_order_error uz",
-            "not_order_error": "not_order_error uz",
-            "worker_status": "worker_status uz",
-            "order_created_time": "order_created_time uz",
-            "order_end": "order_end uz",
-            "order_not_end": "order_not_end uz",
-            "order_status": "order_status uz",
-            "default_message": "default_message uz"
+            "get_location_btn": "Joylashuvni yuborish",
+            "get_place": "Hududni tanlang:",
+            "get_rate": """
+Juft va toq sanalarda maishiy chiqindilarni olib tashlash uchun boshlang'ich tarif mavjud.  
+
+Tarif nomi "Start". 
+
+To'lov formati Click yoki Payme. 
+
+Xizmat narxi 200 000 ming so'm (bu oyiga 12 ta emissiyani o'z ichiga oladi)
+
+To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
+            """,
+            "already_registered": "Siz allaqachon ro'yxatdan o'tgansiz!",
+            "profile_error": "siz hali ro'yxatdan o'tmagansiz",
+            "profile_btn": "Profil",
+            "create_order_btn": "Buyurtma yaratish",
+            "actual_order_btn": "Joriy buyurtma",
+            "name_btn": "Ism",
+            "house_number_btn": "Uy raqami",
+            "apartment_number_btn": "Kvartira raqami",
+            "entrance_number_btn": "Kirish raqami",
+            "floor_number_btn": "Qavat",
+            "comment_btn": "Manzilga sharhlar",
+            "change_profile": "O'zgartirmoqchi bo'lgan maydonni tanlang:",
+            "change_name_message": "Yangi nom kiriting:",
+            "change_house_message": "Uy raqamini kiriting:",
+            "change_apartment_message": "Kvartira raqamini kiriting:",
+            "change_entrance_message": "Kirish raqamini kiriting:",
+            "change_floor_message": "Qavat raqamini kiriting:",
+            "change_comment_message": "Manzil uchun sharhlarni kiriting:",
+            "error_changing": "Tugmani bosing",
+            "complete_changing": "Maʼlumotlar muvaffaqiyatli oʻzgartirildi!",
+            "confirm_btn": "Tasdiqlash✅",
+            "cancel_btn": "Rad etish❌",
+            "delete_btn": "Akkaunt o'chirish❌",
+            "edit_btn": "Profilni tahrirlash",
+            "back_btn": "◀️Orqaga",
+            "help_message": "Administrator bilan bog'lanish",
+            "rate_count_error": "Buyurtmalaringiz tugadi, qolgan buyurtmalar soni 0 ta",
+            "order_success": "Buyurtma yaratildi - sizning buyurtmalaringiz balansi:",
+            "photo_load_error": "Surat yuklashda xatolik yuz berdi!",
+            "name": "Ism:",
+            "phone_number": "Kontakt:",
+            "house_number": "Uy:",
+            "apartment_number": "Kvartira",
+            "entrance_number": "Kirish:",
+            "floor": "Qavat:",
+            "comment_to_address": "Izoh:",
+            "active": "Faol🟢",
+            "not_active": "Faol emas🔴",
+            "status": "Holat:",
+            "deleted_success": "Hisob muvaffaqiyatli o'chirildi!",
+            "accept_photo": "Kuryer buyurtmangizni qabul qilishi uchun eshigingiz yaqinidagi paketlarning fotosuratini yuboring.",
+            "not_ended_order_error": "Sizda tugallanmagan buyurtma bor, bizning kurerimiz buyurtmangizni tez orada tugatadi. Agar muammolar mavjud bo'lsa, 'Yordam' tugmasini bosing",
+            "not_order_error": "Sizda hali hech qanday buyurtma yo'q, Buyurtma yaratish tugmasini bosing",
+            "worker_status": "Kuryer holati:",
+            "order_created_time": "Yaratilish vaqti:",
+            "order_end": "Tugallandi🟢",
+            "order_not_end": "Tugallanmagan🔴",
+            "order_status": "Holat:",
+            "default_message": "To'liq ma'lumot olish uchun buyruqni kiriting / help",
+            "get_contact_btn": "Raqamni yuborish"
         },
         'ru': {
             "greeting_registered": """
@@ -236,7 +332,8 @@ class Localization:
             "order_end": "Закончен🟢",
             "order_not_end": "Незакончен🔴",
             "order_status": "Статус:",
-            "default_message": "Для полной информации введите комманду /help"
+            "default_message": "Для полной информации введите комманду /help",
+            "get_contact_btn": "Отправить контакт"
         }
     }
 

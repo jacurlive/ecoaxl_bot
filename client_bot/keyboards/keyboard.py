@@ -68,18 +68,8 @@ async def profile_view_keyboard(text_1, text_2, text_3, text_4):
             types.KeyboardButton(text=text_4)
         ]
     ]
-    # profile_view_kb = [
-    #     [
-    #         types.KeyboardButton(text="Профиль"),
-    #         types.KeyboardButton(text="Создать заказ"),
-    #         types.KeyboardButton(text="Помощь")
-    #     ],
-    #     [
-    #         types.KeyboardButton(text="Актуальный заказ")
-    #     ]
-    # ]
 
-    profile_view_k= types.ReplyKeyboardMarkup(
+    profile_view_k = types.ReplyKeyboardMarkup(
         keyboard=profile_view_kb,
         resize_keyboard=True,
         one_time_keyboard=True
@@ -98,16 +88,6 @@ async def delete_keyboard(text_1, text_2, text_3):
             types.KeyboardButton(text=text_3)
         ]
     ]
-
-    # delete_kb = [
-    #     [
-    #         types.KeyboardButton(text="Удалить аккаунт❌"),
-    #         types.KeyboardButton(text="Редакторовать профиль")
-    #     ],
-    #     [
-    #         types.KeyboardButton(text="◀️Назад")
-    #     ]
-    # ]
 
     delete_k = types.ReplyKeyboardMarkup(
         keyboard=delete_kb,
@@ -131,19 +111,6 @@ async def profile_column_keyboard(text_1, text_2, text_3, text_4, text_5, text_6
             types.InlineKeyboardButton(text=text_6, callback_data="comment_to_address")
         ]
     ]
-
-    # profile_column_kb = [
-    #     [
-    #         types.InlineKeyboardButton(text="Имя", callback_data="name"),
-    #         types.InlineKeyboardButton(text="номер дома", callback_data="house_number"),
-    #         types.InlineKeyboardButton(text="номер квартиры", callback_data="apartment_number"),
-    #     ],
-    #     [
-    #         types.InlineKeyboardButton(text="номер подьезда", callback_data="entrance_number"),
-    #         types.InlineKeyboardButton(text="этаж", callback_data="floor_number"),
-    #         types.InlineKeyboardButton(text="комментарии к адресу", callback_data="comment_to_address")
-    #     ]
-    # ]
 
     profile_column_k = types.InlineKeyboardMarkup(
         inline_keyboard=profile_column_kb
