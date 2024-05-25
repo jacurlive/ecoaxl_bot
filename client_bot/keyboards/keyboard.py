@@ -57,7 +57,7 @@ async def confirm_keyboard(text_1, text_2):
     return confirm_k
 
 
-async def profile_view_keyboard(text_1, text_2, text_3, text_4):
+async def profile_view_keyboard(text_1, text_2, text_3, text_4, text_5):
     profile_view_kb = [
         [
             types.KeyboardButton(text=text_1),
@@ -65,7 +65,8 @@ async def profile_view_keyboard(text_1, text_2, text_3, text_4):
             types.KeyboardButton(text=text_3)
         ],
         [
-            types.KeyboardButton(text=text_4)
+            types.KeyboardButton(text=text_4),
+            types.KeyboardButton(text=text_5)
         ]
     ]
 

@@ -27,3 +27,7 @@ class DefaultState(StatesGroup):
 class OrderCreate(StatesGroup):
     photo = State()
     accept = State()
+
+
+class LanguageChange(StatesGroup):
+    change = State()

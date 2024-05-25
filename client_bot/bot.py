@@ -13,7 +13,8 @@ from translation.localization import Localization
 from states.states import (
     RegistrationStates,
     ProfileState,
-    OrderCreate
+    OrderCreate,
+    LanguageChange
 )
 from fetches.fetch import (
     fetch_place_data,
@@ -41,7 +42,8 @@ from keyboards.keyboard import (
 )
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO, filename="client_log.log")
+# logging.basicConfig(level=logging.INFO, filename="client_log.log")
+logging.basicConfig(level=logging.INFO)
 
 TOKEN = os.environ['TOKEN']
 bot = Bot(token=TOKEN)
@@ -83,11 +85,14 @@ async def start_command(message: types.Message, state: FSMContext):
         language_code = language_data['lang']
 
         localized_message = await get_localized_message(language_code, "greeting_registered")
+
         localized_btn_1 = await get_localized_message(language_code, "profile_btn")
         localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
-        localized_btn_3 = await get_localized_message(language_code, "help_btn")
-        localized_btn_4 = await get_localized_message(language_code, "actual_order_btn")
-        profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
+        localized_btn_3 = await get_localized_message(language_code, "actual_order_btn")
+        localized_btn_4 = await get_localized_message(language_code, "change_language_btn")
+        localized_btn_5 = await get_localized_message(language_code, "help_btn")
+        profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4,
+                                                  localized_btn_5)
         await message.answer(localized_message, reply_markup=profile_btn)
         await state.clear()
     else:
@@ -219,9 +224,11 @@ async def name_change_process(message: types.Message, state: FSMContext):
     status = await user_change_column(telegram_id=message.from_user.id, data=context, token=TOKEN)
     localized_btn_1 = await get_localized_message(language_code, "profile_btn")
     localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
-    localized_btn_3 = await get_localized_message(language_code, "help_btn")
-    localized_btn_4 = await get_localized_message(language_code, "actual_order_btn")
-    profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
+    localized_btn_3 = await get_localized_message(language_code, "actual_order_btn")
+    localized_btn_4 = await get_localized_message(language_code, "change_language_btn")
+    localized_btn_5 = await get_localized_message(language_code, "help_btn")
+    profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4,
+                                              localized_btn_5)
     if status == 200:
         localized_message = await get_localized_message(language_code, "complete_changing")
         await message.answer(localized_message, reply_markup=profile_btn)
@@ -390,9 +397,11 @@ async def process_comment(message: types.Message, state: FSMContext):
         localized_message = await get_localized_message(language_code, "complete_registration")
         localized_btn_1 = await get_localized_message(language_code, "profile_btn")
         localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
-        localized_btn_3 = await get_localized_message(language_code, "help_btn")
-        localized_btn_4 = await get_localized_message(language_code, "actual_order_btn")
-        profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4)
+        localized_btn_3 = await get_localized_message(language_code, "actual_order_btn")
+        localized_btn_4 = await get_localized_message(language_code, "change_language_btn")
+        localized_btn_5 = await get_localized_message(language_code, "help_btn")
+        profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4,
+                                                  localized_btn_5)
         await bot.send_message(message.from_user.id, localized_message, reply_markup=profile_btn)
         await state.clear()
     except Exception as e:
@@ -447,10 +456,12 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
             response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
             localized_btn_1 = await get_localized_message(language_code, "profile_btn")
             localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
-            localized_btn_3 = await get_localized_message(language_code, "help_btn")
-            localized_btn_4 = await get_localized_message(language_code, "actual_order_btn")
+            localized_btn_3 = await get_localized_message(language_code, "actual_order_btn")
+            localized_btn_4 = await get_localized_message(language_code, "change_language_btn")
+            localized_btn_5 = await get_localized_message(language_code, "help_btn")
             profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3,
-                                                      localized_btn_4)
+                                                      localized_btn_4,
+                                                      localized_btn_5)
             if order is not None and response_code == 200:
                 localized_message = await get_localized_message(language_code, "order_success")
                 await message.answer(f"{localized_message} {new_count}",
@@ -465,6 +476,30 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
     await state.clear()
 
 
+@dp.callback_query(LanguageChange.change)
+async def change_language_process(callback_query: types.CallbackQuery, state: FSMContext):
+    callback_data = callback_query.data
+    chat_id = callback_query.from_user.id
+
+    data = {
+        "lang": callback_data
+    }
+    user_lang = await user_language(data=data, user_id=chat_id, token=TOKEN)
+    if user_lang == 200:
+        language_data = await user_language(user_id=chat_id, token=TOKEN)
+        language_code = language_data['lang']
+
+        localized_btn_1 = await get_localized_message(language_code, "profile_btn")
+        localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
+        localized_btn_3 = await get_localized_message(language_code, "actual_order_btn")
+        localized_btn_4 = await get_localized_message(language_code, "change_language_btn")
+        localized_btn_5 = await get_localized_message(language_code, "help_btn")
+        profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3,
+                                                  localized_btn_4, localized_btn_5)
+        local_message = await get_localized_message(language_code, "change_language_success")
+        await bot.send_message(chat_id, local_message, reply_markup=profile_btn)
+
+
 @dp.message()
 async def registration_start(message: types.Message, state: FSMContext):
     message_answer = message.text
@@ -476,10 +511,11 @@ async def registration_start(message: types.Message, state: FSMContext):
 
     localized_btn_1 = await get_localized_message(language_code, "profile_btn")
     localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
-    localized_btn_3 = await get_localized_message(language_code, "help_btn")
-    localized_btn_4 = await get_localized_message(language_code, "actual_order_btn")
-    profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3,
-                                              localized_btn_4)
+    localized_btn_3 = await get_localized_message(language_code, "actual_order_btn")
+    localized_btn_4 = await get_localized_message(language_code, "change_language_btn")
+    localized_btn_5 = await get_localized_message(language_code, "help_btn")
+    profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4,
+                                              localized_btn_5)
     if message_answer == "Профиль" or message_answer == "Profil":
 
         if user_data is not None:
@@ -606,6 +642,12 @@ async def registration_start(message: types.Message, state: FSMContext):
             await message.answer(
                 f"id: {order['id']}\n{loc_message_5} {status}\n{loc_message_1} {order['is_taken']}\n{loc_message_2} {time_only}",
                 reply_markup=profile_btn)
+
+    elif message_answer == "Изменить язык" or message_answer == "Tilni o'zgartirish":
+        language_btn = await language_keyboard()
+        local_message = await get_localized_message(language_code, "change_language")
+        await message.answer(local_message, reply_markup=language_btn)
+        await state.set_state(LanguageChange.change)
 
     else:
         localized_message = await get_localized_message(language_code, "default_message")

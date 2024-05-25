@@ -167,7 +167,16 @@ To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
             "order_not_end": "Tugallanmagan🔴",
             "order_status": "Holat:",
             "default_message": "To'liq ma'lumot olish uchun buyruqni kiriting / help",
-            "get_contact_btn": "Raqamni yuborish"
+            "get_contact_btn": "Raqamni yuborish",
+            "change_language_btn": "Tilni o'zgartirish",
+            "change_language": "Tilni tanlang",
+            "change_language_success": "Til muvaffaqiyatli o'zgartirildi✅",
+            "back_message": """
+Botdan foydalanish uchun quidagi tugmalardan foydalaning:
+
+Profil - profilingiz xaqida malumot
+Yordam - administrator bilan bog'lanish
+            """
         },
         'ru': {
             "greeting_registered": """
@@ -333,7 +342,18 @@ To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
             "order_not_end": "Незакончен🔴",
             "order_status": "Статус:",
             "default_message": "Для полной информации введите комманду /help",
-            "get_contact_btn": "Отправить контакт"
+            "get_contact_btn": "Отправить контакт",
+            "change_language_btn": "Изменить язык",
+            "change_language": "Выберите язык",
+            "change_language_success": "Язык успешно изменён✅",
+            "back_message": """
+Для пользования бота можете использовать следующие комманды:
+
+/start - Для начала использования или для рестарта
+
+Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
+Нажмите на кнопку - Помощь - что бы связаться с администратором
+            """
         }
     }
 
