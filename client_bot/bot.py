@@ -3,6 +3,8 @@ import os
 import logging
 import requests
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types, F
@@ -49,6 +51,8 @@ TOKEN = os.environ['TOKEN']
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot=bot)
 
+scheduler = AsyncIOScheduler(timezone='Asia/Tashkent')
+
 
 # Функция для отправки локализованных сообщений
 async def get_localized_message(language, key):
@@ -73,6 +77,15 @@ async def send_rates(chat_id, options, language):
     localized_message = await get_localized_message(language=language, key="get_rate")
 
     await bot.edit_message_text(localized_message, chat_id.message.chat.id, chat_id.message.message_id, reply_markup=kb)
+
+
+async def send_message_scheduler(chat_id):
+    await bot.send_message(chat_id, "Test message scheduler")
+
+
+async def scheduler_daily_message(chat_id, hour, minute):
+    trigger = CronTrigger(hour=hour, minute=minute)
+    scheduler.add_job(send_message_scheduler, trigger, args=[chat_id])
 
 
 @dp.message(CommandStart())
@@ -656,6 +669,10 @@ async def registration_start(message: types.Message, state: FSMContext):
 
 async def main():
     await bot(DeleteWebhook(drop_pending_updates=True))
+
+    await scheduler_daily_message(819233688, 23, 43)
+    scheduler.start()
+
     await dp.start_polling(bot)
 
 
