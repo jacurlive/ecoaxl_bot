@@ -22,7 +22,7 @@ class Account(models.Model):
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
-    telegram_id = models.IntegerField(unique=True)
+    telegram_id = models.BigIntegerField(unique=True)
     phone_number = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
     is_confirm = models.BooleanField(default=False)
@@ -50,7 +50,7 @@ class WorkerAccount(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
-    telegram_id = models.IntegerField(unique=True)
+    telegram_id = models.BigIntegerField(unique=True)
     phone_number = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
     is_confirm = models.BooleanField(default=False)
@@ -92,5 +92,5 @@ class ClientOrder(models.Model):
 
 
 class UserLanguage(models.Model):
-    user_id = models.IntegerField(unique=True)
+    user_id = models.BigIntegerField(unique=True)
     lang = models.CharField(max_length=20)

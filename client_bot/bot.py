@@ -123,6 +123,7 @@ async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
         "user_id": callback_query.from_user.id,
         "lang": language_code
     }
+
     post_lang = await post_user_language(data=context, token=TOKEN)
 
     if post_lang == 201 or post_lang == 200:
@@ -571,7 +572,13 @@ async def registration_start(message: types.Message, state: FSMContext):
 
     elif message_answer == "Помощь" or message_answer == "Yordam":
         localized_message = await get_localized_message(language_code, "help_message")
-        await message.answer(localized_message, reply_markup=profile_btn)
+        if user_data is not None:
+            await message.answer(localized_message, reply_markup=profile_btn)
+        else:
+            localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
+            localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
+            register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
+            await message.answer(localized_message, reply_markup=register_btn)
 
     elif message_answer == "◀️Назад" or message_answer == "◀️Orqaga":
         localized_message = await get_localized_message(language_code, "back_message")

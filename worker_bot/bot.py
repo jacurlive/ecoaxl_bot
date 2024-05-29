@@ -41,37 +41,27 @@ async def send_orders(callback_query, orders):
 
 
 
-# @dp.message(CommandStart())
-# async def start_command(message: types.Message, state: FSMContext):
-#     user_data = await get_user_data(message.from_user.id, token=TOKEN)
-#     if user_data != None:
-#         await message.answer("""
-# Для пользования бота можете использовать следующие комманды:
-
-# /start - Для начала использования или для рестарта
-# /help - Для помощи
-                             
-# Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
-#                              """, reply_markup=profile_view_keyboard)
-#     else:
-#         await message.answer(f"""
-# Для пользования бота можете использовать следующие комманды:
-
-# /start - Для начала использования или для рестарта
-# /help - Для помощи
-                             
-# Что бы пройти регистрацию нажмите на кнопку
-#                              """, reply_markup=register_keyboard)
-
 @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
-    kb = [
-        [
-            types.KeyboardButton(text="Open web", web_app=WebAppInfo(url="https://sudoexc.github.io/"))
-        ]
-    ]
-    key = types.ReplyKeyboardMarkup(keyboard=kb)
-    await message.answer("Hello", reply_markup=key)
+    user_data = await get_user_data(message.from_user.id, token=TOKEN)
+    if user_data != None:
+        await message.answer("""
+Для пользования бота можете использовать следующие комманды:
+
+/start - Для начала использования или для рестарта
+/help - Для помощи
+                             
+Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
+                             """, reply_markup=profile_view_keyboard)
+    else:
+        await message.answer(f"""
+Для пользования бота можете использовать следующие комманды:
+
+/start - Для начала использования или для рестарта
+/help - Для помощи
+                             
+Что бы пройти регистрацию нажмите на кнопку
+                             """, reply_markup=register_keyboard)
 
 
 @dp.message(RegistrationStates.name)
