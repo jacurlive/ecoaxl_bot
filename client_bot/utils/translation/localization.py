@@ -360,3 +360,9 @@ Yordam - administrator bilan bog'lanish
     @staticmethod
     def get_translation(language, key):
         return Localization.translations.get(language, {}).get(key, key)
+
+
+# Функция для отправки локализованных сообщений
+async def get_localized_message(language, key):
+    translation = Localization.get_translation(language, key)
+    return translation

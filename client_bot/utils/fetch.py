@@ -1,9 +1,11 @@
 import os
 import aiohttp
 
+from data import config
+
 
 async def fetch_place_data(token):
-    url = f"{os.environ['API']}place/"
+    url = f"{config.API}place/"
 
     headers = {
         'Authorization': token
@@ -16,7 +18,7 @@ async def fetch_place_data(token):
 
 
 async def fetch_rates_data(token):
-    url = f"{os.environ['API']}rates/"
+    url = f"{config.API}rates/"
 
     headers = {
         'Authorization': token
@@ -29,7 +31,7 @@ async def fetch_rates_data(token):
 
 
 async def post_user_info(data, token):
-    url = url = f"{os.environ['API']}account/"
+    url = f"{config.API}account/"
 
     headers = {
         'Authorization': token
@@ -42,7 +44,7 @@ async def post_user_info(data, token):
 
 
 async def user_exist(telegram_id, token):
-    url = f"{os.environ['API']}account/{telegram_id}"
+    url = f"{config.API}account/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -55,7 +57,7 @@ async def user_exist(telegram_id, token):
 
 
 async def get_user_data(telegram_id, token):
-    url = f"{os.environ['API']}account/{telegram_id}"
+    url = f"{config.API}account/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -72,7 +74,7 @@ async def get_user_data(telegram_id, token):
 
 
 async def delete_user_data(telegram_id, token):
-    url = f"{os.environ['API']}account/delete/{telegram_id}"
+    url = f"{config.API}account/delete/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -84,7 +86,7 @@ async def delete_user_data(telegram_id, token):
 
 
 async def user_change_column(telegram_id, data, token):
-    url = f"{os.environ['API']}account/{telegram_id}"
+    url = f"{config.API}account/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -97,7 +99,7 @@ async def user_change_column(telegram_id, data, token):
 
 
 async def create_order(data, token):
-    url = f"{os.environ['API']}order/"
+    url = f"{config.API}order/"
 
     headers = {
         'Authorization': token
@@ -114,7 +116,7 @@ async def create_order(data, token):
 
 
 async def order_exist(telegram_id, token):
-    url = f"{os.environ['API']}order/"
+    url = f"{config.API}order/"
 
     headers = {
         'Authorization': token
@@ -130,7 +132,7 @@ async def order_exist(telegram_id, token):
 
 
 async def take_order(order_id, data, token):
-    url = f"{os.environ['API']}order/{order_id}"
+    url = f"{config.API}order/{order_id}"
 
     headers = {
         'Authorization': token
@@ -147,7 +149,7 @@ async def take_order(order_id, data, token):
 
 
 async def post_user_language(data, token):
-    url = f"{os.environ['API']}account/language"
+    url = f"{config.API}account/language"
 
     headers = {
         'Authorization': token
@@ -161,7 +163,7 @@ async def post_user_language(data, token):
 
 
 async def user_language(data=None, user_id=None, token=None):
-    url = f"{os.environ['API']}account/language/{user_id}"
+    url = f"{config.API}account/language/{user_id}"
 
     headers = {
         'Authorization': token

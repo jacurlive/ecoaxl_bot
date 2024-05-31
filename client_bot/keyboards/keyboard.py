@@ -118,3 +118,6 @@ async def profile_column_keyboard(text_1, text_2, text_3, text_4, text_5, text_6
     )
 
     return profile_column_k
+
+
+# Function which return keyboard under this comment
