@@ -144,3 +144,5 @@ dmypy.json
 
 **/accept/photo/**
 !**/accept/photo
+
+*.sqlite3
