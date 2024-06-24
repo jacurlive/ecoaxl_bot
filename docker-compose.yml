@@ -6,7 +6,7 @@ services:
     container_name: postgres_ecoaxl
     restart: always
     environment:
-      POSTGRES_PASSWORD: eCOaXL321
+      POSTGRES_PASSWORD: ecoaxl123
       POSTGRES_USER: postgres
       POSTGRES_DB: ecoaxl_db
       PGDATA: /var/lib/postgresql/data
