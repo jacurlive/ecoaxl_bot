@@ -5,13 +5,31 @@ from .models import Account, Rates, Place, WorkerAccount, ClientOrder, UserLangu
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
     list_display = (
-        "id", "name", "telegram_id", "phone_number", "is_active", "is_confirm", "rate", "place")
-    list_display_links = ("id", "name", "telegram_id", "phone_number")
+        "id", 
+        "name", 
+        "telegram_id",
+        "phone_number",
+        "is_active",
+        "is_confirm",
+        "rate",
+        "place"
+    )
+    list_display_links = (
+        "id", 
+        "name",
+        "telegram_id",
+        "phone_number"
+        )
 
 
 @admin.register(Rates)
 class RatesAdmin(admin.ModelAdmin):
-    list_display = ("id", "rate_name", "rate_count", "price")
+    list_display = (
+        "id",
+        "rate_name",
+        "rate_count",
+        "price"
+        )
     list_display_links = ("id", "rate_name")
 
 
@@ -22,14 +40,36 @@ class PlaceAdmin(admin.ModelAdmin):
 
 @admin.register(WorkerAccount)
 class WorkerAdmin(admin.ModelAdmin):
-    list_display = ("id", "first_name", "last_name", "telegram_id", "phone_number", "is_active", "is_confirm")
-    list_display_links = ("id", "first_name", "last_name", "telegram_id", "phone_number")
+    list_display = (
+        "id",
+        "first_name",
+        "last_name",
+        "telegram_id", 
+        "phone_number", 
+        "is_active", 
+        "is_confirm"
+        )
+    list_display_links = (
+        "id",
+        "first_name", 
+        "last_name", 
+        "telegram_id", 
+        "phone_number"
+        )
 
 
 @admin.register(ClientOrder)
 class ClientOrderAdmin(admin.ModelAdmin):
     list_display = (
-        "id", "client_id", "worker_id", "client_photo", "worker_photo", "is_completed", "is_taken", "created_date")
+        "id", 
+        "client_id", 
+        "worker_id", 
+        "client_photo", 
+        "worker_photo", 
+        "is_completed", 
+        "is_taken", 
+        "created_date"
+        )
     list_display_links = ("id", "client_id", "worker_id")
     list_editable = ("is_completed", "is_taken")
 

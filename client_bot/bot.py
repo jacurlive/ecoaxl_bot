@@ -42,12 +42,12 @@ from keyboards.keyboard import (
     language_keyboard,
 )
 
-
 # logging.basicConfig(level=logging.INFO, filename="client_log.log")
 logging.basicConfig(level=logging.INFO)
 
 scheduler = AsyncIOScheduler(timezone='Asia/Tashkent')
 TOKEN = config.TOKEN
+
 
 async def send_place(message, options, language):
     kb = types.InlineKeyboardMarkup(
