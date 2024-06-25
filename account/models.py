@@ -33,7 +33,7 @@ class Account(models.Model):
     entrance_number = models.CharField(max_length=30, blank=True, null=True)
     floor_number = models.CharField(max_length=30, blank=True, null=True)
     comment_to_address = models.TextField(blank=True, null=True)
-    rate = models.ForeignKey(Rates, on_delete=models.CASCADE, blank=True, null=True)
+    rate = models.ForeignKey(Rates, on_delete=models.CASCADE)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
     rate_count = models.CharField(max_length=300, blank=True, null=True)
 
