@@ -145,3 +145,10 @@ class UserLanguageDetailAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = UserLanguageSerializer
     permission_classes = [CustomPermission]
     lookup_field = 'user_id'  # Search field
+
+
+class AccountDetailByPhoneNumberAPIView(generics.RetrieveAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    permission_classes = [CustomPermission]
+    lookup_field = 'phone_number'
