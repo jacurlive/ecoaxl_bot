@@ -17,7 +17,8 @@ from states.state import (
     RegistrationStates,
     ProfileState,
     OrderCreate,
-    LanguageChange
+    LanguageChange,
+    TelegramIDPut
 )
 from utils.fetch import (
     fetch_place_data,
@@ -31,7 +32,9 @@ from utils.fetch import (
     order_exist,
     take_order,
     post_user_language,
-    user_language
+    user_language, 
+    get_by_phone,
+    put_id_by_phone
 )
 from keyboards.keyboard import (
     contact_keyboard,
@@ -79,6 +82,17 @@ async def scheduler_daily_message(chat_id, hour, minute):
 
 @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
+    # user_data = await get_user_data(message.from_user.id, token=TOKEN)
+
+    # if user_data is not None:
+    #     await message.answer("Registered")
+    # else:
+    #     contact_btn = await contact_keyboard('contact')
+    #     await message.answer("NOT registered", reply_markup=contact_btn)
+    #     await state.set_state(TelegramIDPut.phone)
+
+
+    #  ------------- V1 -----------------
     user_data = await get_user_data(message.from_user.id, token=TOKEN)
 
     if user_data is not None:
@@ -101,6 +115,7 @@ async def start_command(message: types.Message, state: FSMContext):
 @dp.callback_query(RegistrationStates.get_language)
 async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
     language_code = callback_query.data
+    await state.clear()
 
     context = {
         "user_id": callback_query.from_user.id,
@@ -110,15 +125,47 @@ async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
     post_lang = await post_user_language(data=context, token=TOKEN)
 
     if post_lang == 201 or post_lang == 200:
-        localized_message = await get_localized_message(language=language_code, key="greeting_not_registered")
-        localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
-        localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
-        register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
-        await callback_query.message.answer(localized_message, reply_markup=register_btn)
-        await state.clear()
+        localized_btn = await get_localized_message(language=language_code, key="get_contact_btn")
+        contact_btn = await contact_keyboard(localized_btn)
+        localized_message = await get_localized_message(language=language_code, key="get_contact")
+        await callback_query.message.answer(localized_message, reply_markup=contact_btn)
+        await state.set_state(TelegramIDPut.phone)
+
+        # ----------------- V1 ------------------
+        # localized_message = await get_localized_message(language=language_code, key="greeting_not_registered")
+        # localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
+        # localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
+        # register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
+        # await callback_query.message.answer(localized_message, reply_markup=register_btn)
+        # await state.clear()
     else:
         error_message = await get_localized_message("none", "error")
         await callback_query.message.answer(error_message)
+
+
+@dp.message(TelegramIDPut.phone, F.contact)
+async def put_id(message: types.Message, state: FSMContext):
+    contact = message.contact.phone_number
+    user_id = message.from_user.id
+    language_data = await user_language(user_id=user_id, token=TOKEN)
+    language_code = language_data['lang']
+    
+    response_data = await get_by_phone(contact, token=TOKEN)
+    if response_data is not None:
+        context = {
+            "telegram_id": user_id
+        }
+        response_code = await put_id_by_phone(data=context, contact=contact, token=TOKEN)
+        if response_code == 200:
+            profile_btn = await get_profile_view_btn(language_code=language_code)
+            localized_message = await get_localized_message(language_code, "active_customer")
+            await message.answer(localized_message, reply_markup=profile_btn)
+        else:
+            localized_message = await get_localized_message(language_code, "activation_error")
+            await message.answer(localized_message)
+    else:
+        localized_message = await get_localized_message(language_code, "not_registered_customer")
+        await message.answer(localized_message)
 
 
 @dp.message(ProfileState.profile)

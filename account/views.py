@@ -147,8 +147,8 @@ class UserLanguageDetailAPIView(generics.RetrieveUpdateAPIView):
     lookup_field = 'user_id'  # Search field
 
 
-class AccountDetailByPhoneNumberAPIView(generics.RetrieveAPIView):
-    queryset = Account.objects.all()
+class AccountDetailByPhoneNumberAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Account.objects.filter(is_active=True, is_confirm=True)
     serializer_class = AccountSerializer
     permission_classes = [CustomPermission]
     lookup_field = 'phone_number'

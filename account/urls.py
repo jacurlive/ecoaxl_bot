@@ -19,7 +19,7 @@ urlpatterns = [
     path("account/", AccountCreateView.as_view()),
     path("place/", PlaceView.as_view()),
     path("account/<int:telegram_id>", AccountByTelegramIdView.as_view()),
-    path("account/phone/<int:phone_number>", AccountDetailByPhoneNumberAPIView.as_view()),
+    path("account/phone/<str:phone_number>", AccountDetailByPhoneNumberAPIView.as_view()),
     path("account/delete/<int:telegram_id>", AccountDeleteAPIView.as_view()),
     path("worker/", WorkerCreateView.as_view()),
     path("worker/<int:telegram_id>", WorkerAccountByTelegramIdView.as_view()),

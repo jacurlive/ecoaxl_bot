@@ -4,6 +4,32 @@ import aiohttp
 from data import config
 
 
+async def get_by_phone(contact, token):
+    url = f"{config.API}account/phone/{contact}"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url=url) as response:
+            if response.status == 200:
+                data = await response.json()
+                return data
+
+
+async def put_id_by_phone(data, contact, token):
+    url = f"{config.API}account/phone/{contact}"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.patch(url=url, data=data) as response:
+            return response.status
+
+
 async def fetch_place_data(token):
     url = f"{config.API}place/"
 

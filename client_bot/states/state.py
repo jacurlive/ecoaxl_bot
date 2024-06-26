@@ -31,3 +31,7 @@ class OrderCreate(StatesGroup):
 
 class LanguageChange(StatesGroup):
     change = State()
+
+
+class TelegramIDPut(StatesGroup):
+    phone = State()

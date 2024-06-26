@@ -176,8 +176,13 @@ Botdan foydalanish uchun quidagi tugmalardan foydalaning:
 
 Profil - profilingiz xaqida malumot
 Yordam - administrator bilan bog'lanish
-            """
+            """,
+            "active_customer": "Profilingiz muvofaqiyatli aktivlashtirildi, botni ishlatishingiz mumkin!",
+            "activation_error": "Profilni aktivlashtirish jarayonida xatolik boldi",
+            "not_registered_customer": "Siz ro'yhatga olinmagansiz iltimos administrator bilan bog'laning"
         },
+
+
         'ru': {
             "greeting_registered": """
 Для пользования бота можете использовать следующие комманды:
@@ -252,7 +257,7 @@ Yordam - administrator bilan bog'lanish
         Пожалуйста, имейте в виду, что данное пользовательское соглашение является лишь общими правилами и условиями использования бота. Владелец бота может также иметь дополнительные политики и условия, которые могут быть доступны в боте или на его веб-сайте.
         """,
             "get_name": "Давай начнем процесс регистрации. Введи свое Ф.И.О в формате:\n\nФамилия Имя Отчество\n\nЧерез пробел!",
-            "get_contact": "Отправьте контакт.",
+            "get_contact": "Отправьте контакт с помощью кнопки ниже.",
             "error_name_format": "У вас неправильный формат❗️\n\nВведи свое Ф.И.О в формате:\n\nФамилия Имя Отчество\n\nЧерез пробел!",
             "get_location": """
 Отправьте локацию 
@@ -353,7 +358,10 @@ Yordam - administrator bilan bog'lanish
 
 Нажмите на кнопку - Профиль - для полной информации вашего аккаунта
 Нажмите на кнопку - Помощь - что бы связаться с администратором
-            """
+            """,
+            "active_customer": "Ваш профиль успешно активирован, теперь вы можете позьзоваться ботом!",
+            "activation_error": "Произошла ошибка, попробуйте позже или свяжитесь с администатором",
+            "not_registered_customer": "Вы не регистрированы, пожалуеста ствяжитесь с администратором"
         }
     }
 
