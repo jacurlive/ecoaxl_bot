@@ -179,7 +179,9 @@ Yordam - administrator bilan bog'lanish
             """,
             "active_customer": "Profilingiz muvofaqiyatli aktivlashtirildi, botni ishlatishingiz mumkin!",
             "activation_error": "Profilni aktivlashtirish jarayonida xatolik boldi",
-            "not_registered_customer": "Siz ro'yhatga olinmagansiz iltimos administrator bilan bog'laning"
+            "not_registered_customer": "Siz ro'yhatga olinmagansiz iltimos administrator bilan bog'laning",
+            "additions_message": "Qo'shimcha ma'lumot qo'shish uchun quyida tanlang.",
+            "success_photo": "Rasim joylandi"
         },
 
 
@@ -361,7 +363,9 @@ Yordam - administrator bilan bog'lanish
             """,
             "active_customer": "Ваш профиль успешно активирован, теперь вы можете позьзоваться ботом!",
             "activation_error": "Произошла ошибка, попробуйте позже или свяжитесь с администатором",
-            "not_registered_customer": "Вы не регистрированы, пожалуеста ствяжитесь с администратором"
+            "not_registered_customer": "Вы не регистрированы, пожалуеста ствяжитесь с администратором",
+            "additions_message": "Для добавления дополнительных сведений, выберите ниже",
+            "success_photo": "Фотография добавлена."
         }
     }
 

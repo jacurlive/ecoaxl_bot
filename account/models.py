@@ -73,6 +73,7 @@ class ClientOrder(models.Model):
     entrance_number = models.CharField(max_length=30, blank=True, null=True)
     floor_number = models.CharField(max_length=30, blank=True, null=True)
     comment_to_address = models.TextField(blank=True, null=True)
+    comment_to_order = models.TextField(blank=True, null=True)
     client_photo = models.CharField(max_length=300, blank=True, null=True)
     worker_photo = models.CharField(max_length=300, blank=True, null=True)
 

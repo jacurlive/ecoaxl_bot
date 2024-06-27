@@ -25,7 +25,9 @@ class DefaultState(StatesGroup):
 
 
 class OrderCreate(StatesGroup):
+    additions = State()
     photo = State()
+    comment = State()
     accept = State()
 
 

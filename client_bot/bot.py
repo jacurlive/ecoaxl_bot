@@ -43,6 +43,7 @@ from keyboards.keyboard import (
     register_keyboard,
     location_keyboard,
     language_keyboard,
+    additions_keyboard
 )
 
 # logging.basicConfig(level=logging.INFO, filename="client_log.log")
@@ -149,8 +150,10 @@ async def put_id(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     language_data = await user_language(user_id=user_id, token=TOKEN)
     language_code = language_data['lang']
-    
-    response_data = await get_by_phone(contact, token=TOKEN)
+
+    contact_phone = "+" + contact if "+" not in contact else contact
+    print(contact_phone)
+    response_data = await get_by_phone(contact_phone, token=TOKEN)
     if response_data is not None:
         context = {
             "telegram_id": user_id
@@ -451,20 +454,16 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
                 localized_message = await get_localized_message(language_code, "rate_count_error")
                 await message.answer(localized_message)
                 return
-            new_count = rate_count - 1
             context = {
                 "client_photo": photo_dir
             }
-            user_context = {
-                "rate_count": str(new_count)
-            }
             order = await take_order(order_id=order_id, data=context, token=TOKEN)
-            response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
             profile_btn = await get_profile_view_btn(language_code=language_code)
-            if order is not None and response_code == 200:
-                localized_message = await get_localized_message(language_code, "order_success")
-                await message.answer(f"{localized_message} {new_count}",
+            if order is not None:
+                localized_message = await get_localized_message(language_code, "success_photo")
+                await message.answer(localized_message,
                                      reply_markup=profile_btn)
+                await state.clear()
             else:
                 localized_message = await get_localized_message(language_code, "error")
                 await message.answer(localized_message, reply_markup=profile_btn)
@@ -473,6 +472,30 @@ async def get_accept_photo_process(message: types.Message, state: FSMContext):
         await message.answer(localized_message)
 
     await state.clear()
+
+
+@dp.message(OrderCreate.comment)
+async def comment_to_order_process(message: types.Message, state: FSMContext):
+    message_answer = message.text
+    chat_id = message.from_user.id
+
+    data = await state.get_data()
+    order_id = data.get("order_id")
+
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
+    language_code = language_data['lang']
+    profile_btn = await get_profile_view_btn(language_code=language_code)
+
+    context = {
+        "comment_to_order": message_answer
+    }
+    order = await take_order(order_id=order_id, data=context, token=TOKEN)
+    if order is not None:
+        await message.answer("Коммент добавлен", reply_markup=profile_btn)
+        await state.clear()
+    else:
+        localized_message = await get_localized_message(language_code, "error")
+        await message.answer(localized_message, reply_markup=profile_btn)
 
 
 @dp.callback_query(LanguageChange.change)
@@ -491,6 +514,28 @@ async def change_language_process(callback_query: types.CallbackQuery, state: FS
         profile_btn = await get_profile_view_btn(language_code=language_code)
         local_message = await get_localized_message(language_code, "change_language_success")
         await bot.send_message(chat_id, local_message, reply_markup=profile_btn)
+
+
+@dp.message(OrderCreate.additions)
+async def additions_process(message: types.Message, state: FSMContext):
+    message_answer = message.text
+    user_id = message.from_user.id
+
+    language_data = await user_language(user_id=user_id, token=TOKEN)
+    language_code = language_data['lang']
+
+    profile_btn = await get_profile_view_btn(language_code=language_code)
+
+    if message_answer == "Photo":
+        localized_message = await get_localized_message(language_code, "accept_photo")
+        await message.answer(localized_message)
+        await state.set_state(OrderCreate.photo)
+    elif message_answer == "Comment":
+        await message.answer("Напишите коммент для этого заказа:")
+        await state.set_state(OrderCreate.comment)
+    else:
+        localized_message = await get_localized_message(language_code, "back_message")
+        await message.answer(localized_message, reply_markup=profile_btn)
 
 
 @dp.message()
@@ -588,11 +633,21 @@ async def registration_start(message: types.Message, state: FSMContext):
             order = await create_order(data=context, token=TOKEN)
 
             if order is not None:
-                localized_message = await get_localized_message(language_code, "accept_photo")
-                await message.answer(localized_message)
-                order_id = order['id']
-                await state.update_data(order_id=order_id)
-                await state.set_state(OrderCreate.photo)
+                new_count = rate_count - 1
+
+                user_context = {
+                "rate_count": str(new_count)
+                }
+                response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
+
+                if response_code == 200:
+                    additions_kb = await additions_keyboard("Photo", "Comment", "Back")
+                    localized_message = await get_localized_message(language_code, "order_success")
+                    localized_message_2 = await get_localized_message(language_code, "additions_message")
+                    await message.answer(f"{localized_message} {new_count}\n{localized_message_2}", reply_markup=additions_kb)
+                    order_id = order['id']
+                    await state.update_data(order_id=order_id)
+                    await state.set_state(OrderCreate.additions)
             else:
                 localized_message = await get_localized_message(language_code, "error")
                 await message.answer(localized_message)
