@@ -152,7 +152,8 @@ async def order_get_process(callback_query: types.CallbackQuery, state: FSMConte
     if take != None:
         
         await bot.send_message(callback_query.from_user.id, "Заказ принят\n\nДанные заказа:")
-        if take['photo']:
+
+        if take['client_photo']:
             photo = f"../client_bot/{take['client_photo']}"
             await bot.send_photo(callback_query.from_user.id, photo=types.FSInputFile(photo))
         await bot.send_location(callback_query.from_user.id, latitude=take['latitude'], longitude=take['longitude'])
