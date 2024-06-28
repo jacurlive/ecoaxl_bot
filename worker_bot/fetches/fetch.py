@@ -1,9 +1,11 @@
 import os
 import aiohttp
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 API = os.environ['API']
-
 
 async def fetch_place_data(token):
 
