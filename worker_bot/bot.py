@@ -150,10 +150,11 @@ async def order_get_process(callback_query: types.CallbackQuery, state: FSMConte
     take = await take_order(order_id=order_id, data=data, token=TOKEN)
     
     if take != None:
-        photo = f"../client_bot/{take['client_photo']}"
         
         await bot.send_message(callback_query.from_user.id, "Заказ принят\n\nДанные заказа:")
-        await bot.send_photo(callback_query.from_user.id, photo=types.FSInputFile(photo))
+        if take['photo']:
+            photo = f"../client_bot/{take['client_photo']}"
+            await bot.send_photo(callback_query.from_user.id, photo=types.FSInputFile(photo))
         await bot.send_location(callback_query.from_user.id, latitude=take['latitude'], longitude=take['longitude'])
         await bot.send_message(callback_query.from_user.id, f"Дом: {take['house_number']}\nКвартира: {take['apartment_number']}\nПодъезд: {take['entrance_number']}\nЭтаж: {take['floor_number']}\nКомментарии: {take['comment_to_address']}", reply_markup=complete_keyboard)
         await state.update_data(order_id=order_id)
