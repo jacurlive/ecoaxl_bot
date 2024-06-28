@@ -130,6 +130,6 @@ async def additions_keyboard(text_1, text_2, text_3):
             types.KeyboardButton(text=text_3)
         ]
     ]
-    additions_k = types.ReplyKeyboardMarkup(keyboard=additions_kb)
+    additions_k = types.ReplyKeyboardMarkup(keyboard=additions_kb, resize_keyboard=True)
 
     return additions_k

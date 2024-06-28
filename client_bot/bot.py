@@ -158,7 +158,7 @@ async def put_id(message: types.Message, state: FSMContext):
         context = {
             "telegram_id": user_id
         }
-        response_code = await put_id_by_phone(data=context, contact=contact, token=TOKEN)
+        response_code = await put_id_by_phone(data=context, contact=contact_phone, token=TOKEN)
         if response_code == 200:
             profile_btn = await get_profile_view_btn(language_code=language_code)
             localized_message = await get_localized_message(language_code, "active_customer")

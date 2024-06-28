@@ -2,9 +2,12 @@ import os
 import aiohttp
 
 
+API = os.environ['API']
+
+
 async def fetch_place_data(token):
 
-    url = f"{os.environ['API']}place/"
+    url = f"{API}place/"
 
     headers = {
         'Authorization': token
@@ -17,7 +20,7 @@ async def fetch_place_data(token):
 
 
 async def post_user_info(data, token):
-    url = url = f"{os.environ['API']}worker/"
+    url = url = f"{API}worker/"
 
     headers = {
         'Authorization': token
@@ -31,7 +34,7 @@ async def post_user_info(data, token):
         
 
 async def user_exist(telegram_id, token):
-    url = f"{os.environ['API']}worker/{telegram_id}"
+    url = f"{API}worker/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -44,7 +47,7 @@ async def user_exist(telegram_id, token):
         
 
 async def get_user_data(telegram_id, token):
-    url = f"{os.environ['API']}worker/{telegram_id}"
+    url = f"{API}worker/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -61,7 +64,7 @@ async def get_user_data(telegram_id, token):
         
 
 async def delete_user_data(telegram_id, token):
-    url = f"{os.environ['API']}worker/{telegram_id}"
+    url = f"{API}worker/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -73,7 +76,7 @@ async def delete_user_data(telegram_id, token):
 
 
 async def user_change_column(telegram_id, data, token):
-    url = f"{os.environ['API']}worker/{telegram_id}"
+    url = f"{API}worker/{telegram_id}"
 
     headers = {
         'Authorization': token
@@ -86,7 +89,7 @@ async def user_change_column(telegram_id, data, token):
         
 
 async def get_orders(token):
-    url = f"{os.environ['API']}order/"
+    url = f"{API}order/"
 
     headers = {
         'Authorization': token
@@ -101,7 +104,7 @@ async def get_orders(token):
             
 
 async def take_order(order_id, data, token):
-    url = f"{os.environ['API']}order/{order_id}"
+    url = f"{API}order/{order_id}"
 
     headers = {
         'Authorization': token
