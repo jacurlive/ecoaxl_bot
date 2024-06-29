@@ -122,8 +122,11 @@ async def message_to_all(message: types.Message):
         text = message.text[8:]
         data = await get_customers(token=TOKEN)
         for user in data:
-            if user['telegram_id']:
+            try:
                 await bot.send_message(user['telegram_id'], text)
+                print(user['telegram_id'])
+            except Exception as ex:
+                logging.error(ex)
 
 
 @dp.callback_query(RegistrationStates.get_language)
@@ -165,7 +168,7 @@ async def put_id(message: types.Message, state: FSMContext):
     language_code = language_data['lang']
 
     contact_phone = "+" + contact if "+" not in contact else contact
-    print(contact_phone)
+
     response_data = await get_by_phone(contact_phone, token=TOKEN)
     if response_data is not None:
         context = {
