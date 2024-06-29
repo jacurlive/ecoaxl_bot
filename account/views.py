@@ -39,7 +39,7 @@ class PlaceView(generics.ListAPIView):
     permission_classes = [CustomPermission]
 
 
-class AccountCreateView(generics.CreateAPIView):
+class AccountCreateView(generics.ListCreateAPIView):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     permission_classes = [CustomPermission]

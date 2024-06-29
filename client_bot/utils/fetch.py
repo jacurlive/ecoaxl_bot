@@ -4,6 +4,19 @@ import aiohttp
 from data import config
 
 
+async def get_customers(token):
+    url = f"{config.API}account/"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url=url) as response:
+            data = await response.json()
+            return data
+
+
 async def get_by_phone(contact, token):
     url = f"{config.API}account/phone/{contact}"
 

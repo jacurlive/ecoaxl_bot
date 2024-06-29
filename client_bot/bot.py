@@ -6,7 +6,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime
 from aiogram import types, F
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from utils.translation.localization import get_localized_message
@@ -34,7 +34,8 @@ from utils.fetch import (
     post_user_language,
     user_language, 
     get_by_phone,
-    put_id_by_phone
+    put_id_by_phone,
+    get_customers
 )
 from keyboards.keyboard import (
     contact_keyboard,
@@ -111,6 +112,18 @@ async def start_command(message: types.Message, state: FSMContext):
         welcome_message = await get_localized_message("none", "welcome")
         await message.answer(welcome_message, reply_markup=language_btn)
         await state.set_state(RegistrationStates.get_language)
+
+
+@dp.message(Command("message"))
+async def message_to_all(message: types.Message):
+    user_id = message.from_user.id
+
+    if user_id == 5812918934:
+        text = message.text[8:]
+        data = await get_customers(token=TOKEN)
+        for user in data:
+            if user['telegram_id']:
+                await bot.send_message(user['telegram_id'], text)
 
 
 @dp.callback_query(RegistrationStates.get_language)
