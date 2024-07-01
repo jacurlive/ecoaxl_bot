@@ -4,6 +4,7 @@ import requests
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 from datetime import datetime
 from aiogram import types, F
 from aiogram.filters import CommandStart, Command
@@ -77,8 +78,8 @@ async def send_message_scheduler(chat_id):
     await bot.send_message(chat_id, "Test message scheduler")
 
 
-async def scheduler_daily_message(chat_id, hour, minute):
-    trigger = CronTrigger(hour=hour, minute=minute)
+async def scheduler_daily_message(chat_id):
+    trigger = IntervalTrigger(days=2, hours=7, start_date="2024-06-26 12:00:00")
     scheduler.add_job(send_message_scheduler, trigger, args=[chat_id])
 
 
