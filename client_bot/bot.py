@@ -700,7 +700,7 @@ async def registration_start(message: types.Message, state: FSMContext):
 async def main():
     await bot(DeleteWebhook(drop_pending_updates=True))
 
-    await scheduler_daily_message(819233688, 23, 43)
+    await scheduler_daily_message(819233688)
     scheduler.start()
 
     await dp.start_polling(bot)
