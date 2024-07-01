@@ -162,11 +162,6 @@ async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
 
 @dp.message(TelegramIDPut.phone, F.contact)
 async def put_id(message: types.Message, state: FSMContext):
-    if message.contact and message.contact.user_id == message.from_user.id:
-        await message.answer("ERROR")
-        return 
-    
-
     contact = message.contact.phone_number
     user_id = message.from_user.id
     language_data = await user_language(user_id=user_id, token=TOKEN)
