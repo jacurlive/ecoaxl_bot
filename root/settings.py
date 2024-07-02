@@ -35,7 +35,8 @@ ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.ngrok-free.app",
-    "https://*.ecoaxl.uz"
+    "https://*.ecoaxl.uz",
+    "https://*.jacur.uz"
 ]
 
 
