@@ -169,11 +169,6 @@ JAZZMIN_SETTINGS = {
         {"model": "auth.User"},
 
     ],
-
-    #############
-    # Side Menu #
-    #############
-
 }
 
 
