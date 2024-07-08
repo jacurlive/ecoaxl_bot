@@ -12,3 +12,6 @@ req:
 
 venv:
 	source venv/bin/activate
+
+gunicorn-service:
+	nano /lib/systemd/system/gunicorn.service
