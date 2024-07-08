@@ -33,7 +33,7 @@ class Account(models.Model):
     last_name = models.CharField(max_length=255, blank=True, null=True)
     surname = models.CharField(max_length=255, blank=True, null=True)
     telegram_id = models.BigIntegerField(unique=True, blank=True, null=True)
-    phone_number = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=255)
     is_active = models.BooleanField(default=False, blank=True, null=True)
     is_confirm = models.BooleanField(default=False, blank=True, null=True)
     latitude = models.CharField(max_length=200, blank=True, null=True)

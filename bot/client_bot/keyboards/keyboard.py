@@ -120,11 +120,12 @@ async def profile_column_keyboard(text_1, text_2, text_3, text_4, text_5, text_6
     return profile_column_k
 
 
-async def additions_keyboard(text_1, text_2, text_3):
+async def additions_keyboard(text_1, text_2, text_3, text_4):
     additions_kb = [
         [
             types.KeyboardButton(text=text_1),
-            types.KeyboardButton(text=text_2)
+            types.KeyboardButton(text=text_2),
+            types.KeyboardButton(text=text_4)
         ],
         [
             types.KeyboardButton(text=text_3)

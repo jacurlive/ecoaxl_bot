@@ -29,8 +29,6 @@ SECRET_KEY = 'django-insecure-lvswi)ki!5983x7l8_k+$p8u_f79wza$-w&e1_ke7(_ckv5pf8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-print(os.environ['DEBUG'])
-
 ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [

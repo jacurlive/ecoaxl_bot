@@ -20,7 +20,7 @@ from utils.fetch import (
 TOKEN = config.TOKEN
 
 
-@dp.message(CommandStart())
+# @dp.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
     # user_data = await get_user_data(message.from_user.id, token=TOKEN)
 

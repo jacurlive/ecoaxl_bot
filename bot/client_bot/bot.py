@@ -11,6 +11,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from utils.translation.localization import get_localized_message
+from handlers.users.start import start_command
 from loader import bot, dp
 from data import config
 from utils.get_keyboard import get_profile_column, get_profile_view_btn
@@ -125,7 +126,6 @@ async def message_to_all(message: types.Message):
         for user in data:
             try:
                 await bot.send_message(user['telegram_id'], text)
-                print(user['telegram_id'])
             except Exception as ex:
                 logging.error(ex)
 
@@ -578,14 +578,15 @@ async def registration_start(message: types.Message, state: FSMContext):
                 loc_message_8 = await get_localized_message(language_code, "active")
                 loc_message_9 = await get_localized_message(language_code, "not_active")
                 loc_message_10 = await get_localized_message(language_code, "status")
+                loc_message_11 = await get_localized_message(language_code, "order_count")
                 localized_btn_1 = await get_localized_message(language_code, "delete_btn")
                 localized_btn_2 = await get_localized_message(language_code, "edit_btn")
                 localized_btn_3 = await get_localized_message(language_code, "back_btn")
                 profile_detail_btn = await delete_keyboard(localized_btn_1, localized_btn_2, localized_btn_3)
                 status = loc_message_8 if user_data["is_active"] else loc_message_9
                 await message.answer(
-                    f"{loc_message_1} {user_data['name']}\n{loc_message_2} {user_data['phone_number']}\n{loc_message_3} {user_data['house_number']}\n{loc_message_4} {user_data['apartment_number']}\n{loc_message_5} {user_data['entrance_number']}\n{loc_message_6} {user_data['floor_number']}\n{loc_message_7} {user_data['comment_to_address']}\n{loc_message_10} {status}",
-                    reply_markup=profile_detail_btn)
+                    f"<b>{loc_message_1}</b> {user_data['name']}\n<b>{loc_message_2}</b> {user_data['phone_number']}\n<b>{loc_message_3}</b> {user_data['house_number']}\n<b>{loc_message_4}</b> {user_data['apartment_number']}\n<b>{loc_message_5}</b> {user_data['entrance_number']}\n<b>{loc_message_6}</b> {user_data['floor_number']}\n<b>{loc_message_7}</b> {user_data['comment_to_address']}\n<b>{loc_message_10}</b> {status}\n<b>{loc_message_11}</b> {user_data['rate_count']}",
+                    reply_markup=profile_detail_btn, parse_mode="html")
             else:
                 localized_message = await get_localized_message(language=language_code, key="profile_error")
                 localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
@@ -652,7 +653,7 @@ async def registration_start(message: types.Message, state: FSMContext):
                     response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
 
                     if response_code == 200:
-                        additions_kb = await additions_keyboard("Photo", "Comment", "Back")
+                        additions_kb = await additions_keyboard("Photo", "Comment", "Back", "Вынес мусор")
                         localized_message = await get_localized_message(language_code, "order_success")
                         localized_message_2 = await get_localized_message(language_code, "additions_message")
                         await message.answer(f"{localized_message} {new_count}\n{localized_message_2}", reply_markup=additions_kb)

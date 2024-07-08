@@ -181,7 +181,8 @@ Yordam - administrator bilan bog'lanish
             "activation_error": "Profilni aktivlashtirish jarayonida xatolik boldi",
             "not_registered_customer": "Siz ro'yhatga olinmagansiz iltimos administrator bilan bog'laning",
             "additions_message": "Qo'shimcha ma'lumot qo'shish uchun quyida tanlang.",
-            "success_photo": "Rasim joylandi"
+            "success_photo": "Rasim joylandi",
+            "order_count": "Chiqarishlar soni:"
         },
 
 
@@ -365,7 +366,8 @@ Yordam - administrator bilan bog'lanish
             "activation_error": "Произошла ошибка, попробуйте позже или свяжитесь с администатором",
             "not_registered_customer": "Вы не регистрированы, пожалуеста ствяжитесь с администратором",
             "additions_message": "Для добавления дополнительных сведений, выберите ниже",
-            "success_photo": "Фотография добавлена."
+            "success_photo": "Фотография добавлена.",
+            "order_count": "Количество выносов:"
         }
     }
 
