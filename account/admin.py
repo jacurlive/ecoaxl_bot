@@ -6,7 +6,8 @@ from .models import Account, Rates, Place, WorkerAccount, ClientOrder, UserLangu
 class AccountAdmin(admin.ModelAdmin):
     list_display = (
         "id", 
-        "name", 
+        "name",
+        "last_name",
         "telegram_id",
         "phone_number",
         "is_active",
@@ -19,7 +20,13 @@ class AccountAdmin(admin.ModelAdmin):
         "name",
         "telegram_id",
         "phone_number"
-        )
+    )
+    search_fields = (
+        "id",
+        "name",
+        "last_name",
+        "phone_number"
+    )
 
 
 @admin.register(Rates)

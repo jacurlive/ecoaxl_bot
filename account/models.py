@@ -8,8 +8,8 @@ class Rates(models.Model):
     price = models.FloatField()
 
     class Meta:
-        verbose_name = ("Rate")
-        verbose_name_plural = ("Rates")
+        verbose_name = ("Тариф")
+        verbose_name_plural = ("Тарифы")
 
 
     def __str__(self) -> str:
@@ -20,8 +20,8 @@ class Place(models.Model):
     name = models.CharField(max_length=300)
 
     class Meta:
-        verbose_name = ("Place")
-        verbose_name_plural = ("Places")
+        verbose_name = ("Район")
+        verbose_name_plural = ("Районы")
 
 
     def __str__(self) -> str:
@@ -49,8 +49,8 @@ class Account(models.Model):
 
 
     class Meta:
-        verbose_name = ("Customer")
-        verbose_name_plural = ("Customers")
+        verbose_name = ("Клиент")
+        verbose_name_plural = ("Клиенты")
 
 
     def save(self, *args, **kwargs):
@@ -72,8 +72,8 @@ class WorkerAccount(models.Model):
     is_confirm = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = ("Worker")
-        verbose_name_plural = ("Workers")
+        verbose_name = ("Курьер")
+        verbose_name_plural = ("Курьеры")
 
     def __str__(self) -> str:
         return self.first_name
@@ -98,8 +98,8 @@ class ClientOrder(models.Model):
     worker_photo = models.CharField(max_length=300, blank=True, null=True)
 
     class Meta:
-        verbose_name = ("Client Order")
-        verbose_name_plural = ("Client Orders")
+        verbose_name = ("Заказы")
+        verbose_name_plural = ("Заказы")
 
 
     def save(self, *args, **kwargs):
@@ -122,5 +122,5 @@ class UserLanguage(models.Model):
     lang = models.CharField(max_length=20)
 
     class Meta:
-        verbose_name = ("User Language")
-        verbose_name_plural = ("User Languages")
+        verbose_name = ("Язык клиента")
+        verbose_name_plural = ("Язык клиентов")

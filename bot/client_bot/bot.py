@@ -49,6 +49,7 @@ from keyboards.keyboard import (
     additions_keyboard
 )
 
+
 # logging.basicConfig(level=logging.INFO, filename="client_log.log")
 logging.basicConfig(level=logging.INFO)
 
@@ -114,6 +115,10 @@ async def start_command(message: types.Message, state: FSMContext):
         welcome_message = await get_localized_message("none", "welcome")
         await message.answer(welcome_message, reply_markup=language_btn)
         await state.set_state(RegistrationStates.get_language)
+
+
+# def setup_handlers(dp: Dispatcher):
+#     dp.include_router(users.prepare_router())
 
 
 @dp.message(Command("message"))
