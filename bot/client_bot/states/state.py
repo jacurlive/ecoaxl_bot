@@ -37,3 +37,7 @@ class LanguageChange(StatesGroup):
 
 class TelegramIDPut(StatesGroup):
     phone = State()
+
+
+class RegisterType(StatesGroup):
+    choose = State()

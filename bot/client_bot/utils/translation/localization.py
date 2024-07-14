@@ -157,7 +157,7 @@ To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
             "active": "Faol🟢",
             "not_active": "Faol emas🔴",
             "status": "Holat:",
-            "deleted_success": "Hisob muvaffaqiyatli o'chirildi!",
+            "deleted_success": "Akkaunt muvaffaqiyatli o'chirildi!",
             "accept_photo": "Kuryer buyurtmangizni qabul qilishi uchun eshigingiz yaqinidagi paketlarning fotosuratini yuboring.",
             "not_ended_order_error": "Sizda tugallanmagan buyurtma bor, bizning kurerimiz buyurtmangizni tez orada tugatadi. Agar muammolar mavjud bo'lsa, 'Yordam' tugmasini bosing",
             "not_order_error": "Sizda hali hech qanday buyurtma yo'q, Buyurtma yaratish tugmasini bosing",
@@ -182,7 +182,9 @@ Yordam - administrator bilan bog'lanish
             "not_registered_customer": "Siz ro'yhatga olinmagansiz iltimos administrator bilan bog'laning",
             "additions_message": "Qo'shimcha ma'lumot qo'shish uchun quyida tanlang.",
             "success_photo": "Rasim joylandi",
-            "order_count": "Chiqarishlar soni:"
+            "order_count": "Chiqarishlar soni:",
+            "account_activation": "Akkauntni faolashtirish",
+            "register_type": "Ro'yhatdan o'tish usulini tanlang"
         },
 
 
@@ -367,7 +369,9 @@ Yordam - administrator bilan bog'lanish
             "not_registered_customer": "Вы не регистрированы, пожалуеста ствяжитесь с администратором",
             "additions_message": "Для добавления дополнительных сведений, выберите ниже",
             "success_photo": "Фотография добавлена.",
-            "order_count": "Количество выносов:"
+            "order_count": "Количество выносов:",
+            "account_activation": "Активировать аккаунт",
+            "register_type": "Выберите способ регистрации"
         }
     }
 

@@ -1,6 +1,23 @@
 from aiogram import types
 
 
+async def register_type_keyboard(text_1: str, text_2: str):
+    register_type_kb = [
+        [
+            types.KeyboardButton(
+                text=text_1
+                ),
+            types.KeyboardButton(
+                text=text_2
+            )
+        ]
+    ]
+
+    register_type_k = types.ReplyKeyboardMarkup(keyboard=register_type_kb, resize_keyboard=True, one_time_keyboard=True)
+
+    return register_type_k
+
+
 async def contact_keyboard(text):
     contact_k = types.ReplyKeyboardMarkup(
         keyboard=[[types.KeyboardButton(text=text, request_contact=True)]],
