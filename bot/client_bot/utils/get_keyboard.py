@@ -7,9 +7,10 @@ async def get_profile_view_btn(language_code):
     localized_btn_2 = await get_localized_message(language_code, "create_order_btn")
     localized_btn_3 = await get_localized_message(language_code, "actual_order_btn")
     localized_btn_4 = await get_localized_message(language_code, "change_language_btn")
-    localized_btn_5 = await get_localized_message(language_code, "help_btn")
+    localized_btn_5 = await get_localized_message(language_code, "buy_rate")
+    localized_btn_6 = await get_localized_message(language_code, "help_btn")
     profile_btn = await profile_view_keyboard(localized_btn_1, localized_btn_2, localized_btn_3, localized_btn_4,
-                                              localized_btn_5)
+                                              localized_btn_5, localized_btn_6)
 
     return profile_btn
 

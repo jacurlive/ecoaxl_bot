@@ -77,8 +77,15 @@ class ClientOrderAdmin(admin.ModelAdmin):
         "is_taken", 
         "created_date"
         )
-    list_display_links = ("id", "client_id", "worker_id")
-    list_editable = ("is_completed", "is_taken")
+    list_display_links = (
+        "id", 
+        "client_id", 
+        "worker_id"
+        )
+    list_editable = (
+        "is_completed",
+        "is_taken"
+        )
 
 
 @admin.register(UserLanguage)

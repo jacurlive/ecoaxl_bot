@@ -2,6 +2,7 @@ import asyncio
 import logging
 import requests
 
+from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
@@ -38,7 +39,8 @@ from utils.fetch import (
     user_language, 
     get_by_phone,
     put_id_by_phone,
-    get_customers
+    get_customers,
+    rate_detail
 )
 from keyboards.keyboard import (
     contact_keyboard,
@@ -48,7 +50,8 @@ from keyboards.keyboard import (
     location_keyboard,
     language_keyboard,
     additions_keyboard,
-    register_type_keyboard
+    register_type_keyboard,
+    payment_type_keyboard
 )
 
 
@@ -57,6 +60,34 @@ logging.basicConfig(level=logging.INFO)
 
 scheduler = AsyncIOScheduler(timezone='Asia/Tashkent')
 TOKEN = config.TOKEN
+
+
+@dp.message(Command("dep"))
+async def dep_test(message: types.Message):
+    await bot.send_invoice(
+        chat_id=message.from_user.id,
+        title="Title",
+        description="Description",
+        payload="Payload",
+        provider_token=config.CLICK_PROVIDER_TOKEN,
+        currency="UZS",
+        prices=[
+            types.LabeledPrice(label="Price Label", amount=12_000_000)
+        ],
+        max_tip_amount=500_000,
+        start_parameter="",
+        provider_data=None,
+        photo_url="https://fastly.picsum.photos/id/0/5000/3333.jpg?hmac=_j6ghY5fCfSD6tvtcV74zXivkJSPIfR9B8w34XeQmvU",
+        photo_height=200,
+        photo_width=300,
+        is_flexible=False,
+        protect_content=False,
+        need_name=True,
+        need_email=False,
+        need_phone_number=False,
+        need_shipping_address=False,
+        request_timeout=15
+    )
 
 
 async def send_place(message, options, language):
@@ -357,10 +388,74 @@ async def callback_query_process_rate(callback_query: types.CallbackQuery, state
     language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
+    payment_k = await payment_type_keyboard("Click", "Payme")
+    await callback_query.message.answer("Choose payment type", reply_markup=payment_k)
+    # await bot.send_message(callback_query.from_user.id, localized_message, reply_markup=location_btn)
+    await state.set_state(RegistrationStates.invoce)
+
+
+@dp.message(RegistrationStates.invoce)
+async def invoce_process(message: types.Message, state: FSMContext):
+    message_answer = message.text
+    provider = config.CLICK_PROVIDER_TOKEN if message_answer == "Click" else config.PAYME_PROVIDER_TOKEN
+    data = await state.get_data()
+
+    rate_id = data.get("rate")
+    rate_data = await rate_detail(rate_id=rate_id, token=TOKEN)
+
+    if rate_data is not None:
+        title = rate_data['rate_name']
+        description = rate_data['description']
+        rate_amount = rate_data['price']
+
+        await bot.send_invoice(
+            chat_id=message.from_user.id,
+            title=title,
+            description=description,
+            payload="Payload",
+            provider_token=provider,
+            currency="UZS",
+            prices=[
+                types.LabeledPrice(label="Price Label", amount=rate_amount)
+            ],
+            max_tip_amount=500_000,
+            start_parameter="",
+            provider_data=None,
+            photo_url="https://fastly.picsum.photos/id/0/5000/3333.jpg?hmac=_j6ghY5fCfSD6tvtcV74zXivkJSPIfR9B8w34XeQmvU",
+            photo_height=200,
+            photo_width=300,
+            is_flexible=False,
+            protect_content=False,
+            need_name=True,
+            need_email=False,
+            need_phone_number=False,
+            need_shipping_address=False,
+            request_timeout=15
+        )
+        await state.set_state(RegistrationStates.payment)
+
+
+@dp.pre_checkout_query()
+async def receive_handler(pre_checkout_query: types.PreCheckoutQuery):
+    await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+
+
+@dp.message(F.successful_payment, RegistrationStates.payment)
+async def payment_handler(message: types.Message, state: FSMContext):
+    chat_id = message.from_user.id
+
+    language_data = await user_language(user_id=chat_id, token=TOKEN)
+    language_code = language_data['lang']
+
+    text = f"*To'lov qabul qilindi*\n\nTo'langan summa: {message.successful_payment.total_amount}\n"
+    current_time = datetime.now()
+    iso_time = current_time.isoformat()
+    await state.update_data(is_active="true", payment_date=iso_time)
+    await message.answer(text)
     localized_message = await get_localized_message(language=language_code, key="get_location")
     localized_btn = await get_localized_message(language=language_code, key="get_location_btn")
     location_btn = await location_keyboard(localized_btn)
-    await bot.send_message(callback_query.from_user.id, localized_message, reply_markup=location_btn)
+    await message.answer(localized_message, reply_markup=location_btn)
     await state.set_state(RegistrationStates.location)
 
 
@@ -392,8 +487,12 @@ async def process_house_data(message: types.Message, state: FSMContext):
     try:
         list_data = message.text.split("/")
 
-        await state.update_data(house_number=list_data[0], apartment_number=list_data[1], entrance_number=list_data[2],
-                                floor_number=list_data[3])
+        await state.update_data(
+            house_number=list_data[0], 
+            apartment_number=list_data[1],
+            entrance_number=list_data[2],
+            floor_number=list_data[3]
+            )
         await message.delete()
 
         data = await state.get_data()
@@ -417,6 +516,7 @@ async def process_comment(message: types.Message, state: FSMContext):
 
     data = await state.get_data()
     chat_id = message.from_user.id
+    print(data)
 
     language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
@@ -696,6 +796,8 @@ async def registration_start(message: types.Message, state: FSMContext):
             local_message = await get_localized_message(language_code, "change_language")
             await message.answer(local_message, reply_markup=language_btn)
             await state.set_state(LanguageChange.change)
+        case "Тарифы" | "Tariflar":
+            pass
         case _:
             localized_message = await get_localized_message(language_code, "default_message")
             await message.answer(localized_message)

@@ -8,6 +8,8 @@ class RegistrationStates(StatesGroup):
     confirmation = State()
     place = State()
     rate = State()
+    invoce = State()
+    payment = State()
     location = State()
     home = State()
     comment = State()
@@ -41,3 +43,7 @@ class TelegramIDPut(StatesGroup):
 
 class RegisterType(StatesGroup):
     choose = State()
+
+
+class Rates(StatesGroup):
+    pass

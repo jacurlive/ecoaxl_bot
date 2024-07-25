@@ -78,8 +78,10 @@ async def post_user_info(data, token):
 
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post(url, data=data) as response:
-            data = await response.json()
-            return data
+            response_code = response.status
+            if response_code == 201 or response_code == 200:
+                data = await response.json()
+                return data
 
 
 async def user_exist(telegram_id, token):
@@ -221,3 +223,18 @@ async def user_language(data=None, user_id=None, token=None):
                     return language_data
                 else:
                     print("123")
+
+
+async def rate_detail(rate_id, token):
+    url = f"{config.API}rates/{rate_id}"
+
+    headers = {
+        'Authorization': token
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url=url) as response:
+            response_code = response.status
+            if response_code == 200:
+                response_data = await response.json()
+                return response_data

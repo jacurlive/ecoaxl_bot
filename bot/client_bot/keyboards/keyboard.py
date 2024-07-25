@@ -1,6 +1,22 @@
 from aiogram import types
 
 
+async def payment_type_keyboard(text_1, text_2):
+    payment_type_kb = [
+        [
+            types.KeyboardButton(
+                text=text_1
+            ),
+            types.KeyboardButton(
+                text=text_2
+            )
+        ]
+    ]
+
+    payment_type_k = types.ReplyKeyboardMarkup(keyboard=payment_type_kb, resize_keyboard=True, one_time_keyboard=True)
+    return payment_type_k
+
+
 async def register_type_keyboard(text_1: str, text_2: str):
     register_type_kb = [
         [
@@ -74,7 +90,7 @@ async def confirm_keyboard(text_1, text_2):
     return confirm_k
 
 
-async def profile_view_keyboard(text_1, text_2, text_3, text_4, text_5):
+async def profile_view_keyboard(text_1, text_2, text_3, text_4, text_5, text_6):
     profile_view_kb = [
         [
             types.KeyboardButton(text=text_1),
@@ -83,7 +99,8 @@ async def profile_view_keyboard(text_1, text_2, text_3, text_4, text_5):
         ],
         [
             types.KeyboardButton(text=text_4),
-            types.KeyboardButton(text=text_5)
+            types.KeyboardButton(text=text_5),
+            types.KeyboardButton(text=text_6)
         ]
     ]
 

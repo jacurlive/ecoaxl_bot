@@ -6,6 +6,7 @@ class Rates(models.Model):
     rate_name = models.CharField(max_length=300)
     rate_count = models.IntegerField()
     price = models.FloatField()
+    description = models.TextField()
 
     class Meta:
         verbose_name = ("Тариф")
@@ -46,6 +47,9 @@ class Account(models.Model):
     rate = models.ForeignKey(Rates, on_delete=models.CASCADE)
     place = models.ForeignKey(Place, on_delete=models.CASCADE, blank=True, null=True)
     rate_count = models.CharField(max_length=300, blank=True, null=True)
+    payment_date = models.DateTimeField(blank=True, null=True)
+    create_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
 
 
     class Meta:

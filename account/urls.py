@@ -11,7 +11,8 @@ from .views import (
     ClientOrderByIDView,
     UserLanguageListAPIView,
     UserLanguageDetailAPIView,
-    AccountDetailByPhoneNumberAPIView
+    AccountDetailByPhoneNumberAPIView,
+    RateDetailByID
 )
 
 urlpatterns = [
@@ -26,5 +27,6 @@ urlpatterns = [
     path("order/", ClientOrderView.as_view()),
     path("order/<int:pk>", ClientOrderByIDView.as_view()),
     path("account/language", UserLanguageListAPIView.as_view()),
-    path("account/language/<int:user_id>", UserLanguageDetailAPIView.as_view())
+    path("account/language/<int:user_id>", UserLanguageDetailAPIView.as_view()),
+    path("rates/<int:pk>", RateDetailByID.as_view())
 ]

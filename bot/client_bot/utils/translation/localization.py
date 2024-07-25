@@ -184,7 +184,8 @@ Yordam - administrator bilan bog'lanish
             "success_photo": "Rasim joylandi",
             "order_count": "Chiqarishlar soni:",
             "account_activation": "Akkauntni faolashtirish",
-            "register_type": "Ro'yhatdan o'tish usulini tanlang"
+            "register_type": "Ro'yhatdan o'tish usulini tanlang",
+            "buy_rate": "Tariflar"
         },
 
 
@@ -371,7 +372,8 @@ Yordam - administrator bilan bog'lanish
             "success_photo": "Фотография добавлена.",
             "order_count": "Количество выносов:",
             "account_activation": "Активировать аккаунт",
-            "register_type": "Выберите способ регистрации"
+            "register_type": "Выберите способ регистрации",
+            "buy_rate": "Тарифы"
         }
     }
 
