@@ -13,7 +13,10 @@ class AccountAdmin(admin.ModelAdmin):
         "is_active",
         "is_confirm",
         "rate",
-        "place"
+        "place",
+        "create_date",
+        "payment_date",
+        "update_date"
     )
     list_display_links = (
         "id", 
