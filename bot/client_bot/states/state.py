@@ -22,6 +22,10 @@ class ProfileState(StatesGroup):
     change_process = State()
 
 
+class UpdateRate(StatesGroup):
+    rate = State()
+
+
 class DefaultState(StatesGroup):
     main = State()
 

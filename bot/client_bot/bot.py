@@ -99,14 +99,26 @@ async def send_place(message, options, language):
     await bot.send_message(message.from_user.id, localized_message, reply_markup=kb)
 
 
-async def send_rates(chat_id, options, language):
+async def send_rates_edit(message, options, language):
     kb = types.InlineKeyboardMarkup(
         inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item
                          in options], row_width=1)
 
     localized_message = await get_localized_message(language=language, key="get_rate")
 
-    await bot.edit_message_text(localized_message, chat_id.message.chat.id, chat_id.message.message_id, reply_markup=kb)
+    await bot.edit_message_text(localized_message, message.message.chat.id, message.message.message_id, reply_markup=kb)
+
+
+async def send_rates(message, options, language):
+    kb = types.InlineKeyboardMarkup(
+        inline_keyboard=[[
+            types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item in options
+        ],
+        row_width=1
+        )
+
+    localized_message = await get_localized_message(language=language, key="get_rate")
+    await bot.send_message(message.from_user.id, localized_message, reply_markup=kb)
 
 
 async def send_message_scheduler(chat_id):
@@ -374,7 +386,7 @@ async def callback_query_process_place(callback_query: types.CallbackQuery, stat
 
     options = [{'name': item['rate_name'], 'callback_data': str(item['id'])} for item in rates_data]
 
-    await send_rates(callback_query, options, language_code)
+    await send_rates_edit(callback_query, options, language_code)
 
     await state.set_state(RegistrationStates.rate)
 
@@ -407,6 +419,8 @@ async def invoce_process(message: types.Message, state: FSMContext):
         title = rate_data['rate_name']
         description = rate_data['description']
         rate_amount = rate_data['price']
+        url_photo = f"{config.API}media/rate-start.jpg"
+        print(url_photo)
 
         await bot.send_invoice(
             chat_id=message.from_user.id,
@@ -421,9 +435,9 @@ async def invoce_process(message: types.Message, state: FSMContext):
             max_tip_amount=500_000,
             start_parameter="",
             provider_data=None,
-            photo_url="https://fastly.picsum.photos/id/0/5000/3333.jpg?hmac=_j6ghY5fCfSD6tvtcV74zXivkJSPIfR9B8w34XeQmvU",
-            photo_height=200,
-            photo_width=300,
+            photo_url=url_photo,
+            photo_height=500,
+            photo_width=600,
             is_flexible=False,
             protect_content=False,
             need_name=True,
@@ -797,7 +811,14 @@ async def registration_start(message: types.Message, state: FSMContext):
             await message.answer(local_message, reply_markup=language_btn)
             await state.set_state(LanguageChange.change)
         case "Тарифы" | "Tariflar":
-            pass
+            language_data = await user_language(user_id=chat_id, token=TOKEN)
+            language_code = language_data['lang']
+
+            rates_data = await fetch_rates_data(TOKEN)
+
+            options = [{'name': item['rate_name'], 'callback_data': str(item['id'])} for item in rates_data]
+
+            await send_rates(message, options, language_code)
         case _:
             localized_message = await get_localized_message(language_code, "default_message")
             await message.answer(localized_message)
