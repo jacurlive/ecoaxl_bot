@@ -20,7 +20,7 @@ class MainView(View):
 
     def get(self, request):
         return render(request, 'main/index.html')
-    
+
 
 class ServeImageView(View):
     def get(self, request, filename):

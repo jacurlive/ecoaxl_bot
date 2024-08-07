@@ -419,7 +419,7 @@ async def invoce_process(message: types.Message, state: FSMContext):
         title = rate_data['rate_name']
         description = rate_data['description']
         rate_amount = rate_data['price']
-        url_photo = f"{config.API}media/rate-start.jpg"
+        url_photo = "http://127.0.0.1/media/rate-start.jpg"
         print(url_photo)
 
         await bot.send_invoice(
@@ -435,8 +435,8 @@ async def invoce_process(message: types.Message, state: FSMContext):
             max_tip_amount=500_000,
             start_parameter="",
             provider_data=None,
-            photo_url=url_photo,
-            photo_height=500,
+            photo_url="https://ecoaxl.uz/media/rate-start.jpg",
+            photo_height=400,
             photo_width=600,
             is_flexible=False,
             protect_content=False,
