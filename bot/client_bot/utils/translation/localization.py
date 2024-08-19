@@ -7,119 +7,108 @@ class Localization:
         },
         'uz': {
             "greeting_registered": """
-Botdan foydalanish uchun quidagi tugmalardan foydalaning:
+🌟 Botdan foydalanishni boshlash uchun quyidagi buyruqlardan foydalaning:
 
-Profil - profilingiz xaqida malumot
-Yordam - administrator bilan bog'lanish
+➡️ /start - Ishlatishni boshlash yoki qayta boshlash uchun
+
+📋 Profilingiz haqida to‘liq ma’lumot olish uchun Profil tugmasini bosing.
+📞 Administrator bilan bog‘lanish uchun Yordam tugmasini bosing.
             """,
             "greeting_not_registered": """
-Xayrli kun aziz foydalanuvchi! 
+🌿 Hurmatli foydalanuvchi, assalomu alaykum!
 
-Biz sizga uyingizdan chiqmasdan maishiy chiqindilardan xalos bo'lishga yordam beradigan ECO AXL xizmatini taklif etamiz!
+Biz sizga ECO AXL xizmatini taklif etamiz, u sizga uy chiqindilaridan chiqmasdan qutulishga yordam beradi! 🚮
 
-Biz xonadonlar va xususiy uylardan maishiy chiqindilarni olib chiqamiz.
+🏠 Biz kvartiralar va xususiy uylar uchun maishiy chiqindilarni olib chiqamiz.
 
-Har qanday obuna uchun siz og'irligi 7 kg gacha bo'lgan 5 tadan ko'p bo'lmagan sumka olishingiz mumkin
+Har qanday obunada 7 kg gacha bo‘lgan 5 ta sumkadan ortiq bo‘lmagan chiqindi olib chiqish imkoniyati mavjud.
 
+Bizning xizmatimiz quyidagi toifadagi odamlar uchun mos:
 
-Bizning xizmatimiz quyidagi toifadagi odamlar uchun javob beradi: 
+🧑‍💻🧑‍🔧 Ishbilarmon va band odamlar uchun.
 
-Ish va band odamlar uchun.  🧑‍💻🧑‍🔧
+🎮 Geymerlar va uyda o‘tiradiganlar uchun foydali.
 
-Geymerlar va uydagilar uchun foydali.🎮
+👩‍👧‍👦 Dekretdagi onalarga yordam beramiz.
 
-Biz tug'ruq ta'tilidagi onalarga yordam beramiz.👩‍👧‍👦
+🧑‍🦳👨‍🦳 Keksalarga obuna rasmiylashtiring.
 
-Katta yoshdagilarga obuna bo'ling🧑‍  👨‍  
+😷 Kasallik tufayli ko‘chaga chiqmaydiganlar uchun.
 
-Kasal bo'lib ko'chaga chiqmaydiganlar uchun😷
+👨‍🦽 Harakatlanishi cheklangan fuqarolar uchun zarur.
 
-Harakati cheklangan odamlar uchun zarur👨‍  
             """,
             "confirmation": """
-<b>Telegram boti uchun foydalanuvchi shartnomasi</b>
+❗️Iltimos, foydalanuvchi shartnomasi bilan tanishing❗️
 
-Eʼtibor bering, quyidagi foydalanuvchi shartnomasi xizmat koʻrsatish sohasida tijorat bilan shugʻullanuvchi Telegram botidan foydalanishning umumiy shartlari va shartlarini tashkil qiladi. Ushbu shartlar bot egasi va uning foydalanuvchilari o'rtasidagi munosabatlarni tavsiflaydi. Iltimos, botni ishlatishdan oldin ularni diqqat bilan o'qing.
-
-<b>1. Xizmatlar</b>ni taqdim etish
-         1.1. Bot egasi Telegram boti orqali xizmatlarni taklif qiladi va ularni botda taqdim etilgan xizmatlar tavsifiga muvofiq taqdim etish majburiyatini oladi.
-         1.2. Bot egasi istalgan vaqtda foydalanuvchini oldindan ogohlantirmasdan istalgan xizmatlarni o'zgartirish, yangilash yoki to'xtatish huquqini o'zida saqlab qoladi.
-
-<b>2. Mas'uliyatni cheklash</b>
-         2.1. Botning egasi bot tomonidan taqdim etilgan xizmatlardan foydalanish natijasida foydalanuvchilarning bevosita yoki bilvosita zararlari uchun javobgar emas.
-         2.2. Bot egasi botdan noto'g'ri foydalanish yoki taqdim etilgan ma'lumotlarni noto'g'ri talqin qilish natijasida yuzaga keladigan muammolar uchun javobgar emas.
-         2.3. Bot egasi Telegram platformasi yoki boshqa botlar yoki uchinchi tomon xizmatlari bilan o‘zaro aloqalar bilan bog‘liq muammolar uchun javobgar emas.
-
-<b>3. Maxfiylik</b>
-         3.1. Bot egasi foydalanuvchilarning shaxsiy ma'lumotlarini amaldagi ma'lumotlarni himoya qilish qonunlariga muvofiq qayta ishlash majburiyatini oladi.
-         3.2. Bot egasi, qonun hujjatlarida nazarda tutilgan hollar bundan mustasno, foydalanuvchilarning shaxsiy ma'lumotlarini ularning oldindan roziligisiz uchinchi shaxslarga o'tkazmaydi.
-
-<b>4. Intellektual mulk</b>
-         4.1. Bot bilan bog'liq barcha intellektual mulk huquqlari (jumladan, mualliflik huquqlari va savdo belgilari bilan cheklanmagan holda) bot egasiga tegishli.
-         4.2. Foydalanuvchilar bot egasining yozma roziligisiz bot tarkibidan foydalanishi, nusxalashi, o‘zgartirishi yoki tarqatishi mumkin emas.
-
-         <b>5. Suiiste'mol qilishni taqiqlash</b>
-         5.1. Foydalanuvchilarga botdan noqonuniy, zararli yoki haqoratomuz kontentni tarqatish uchun foydalanishi taqiqlanadi.
-         5.2. Foydalanuvchilarga botdan firibgarlik, spam yoki bot egasiga yoki boshqa foydalanuvchilarga zarar yetkazishi mumkin bo‘lgan boshqa harakatlar uchun foydalanishi taqiqlanadi.
-
-<b>6. Foydalanuvchi shartnomasini o'zgartirish</b>
-         6.1. Bot egasi istalgan vaqtda ushbu foydalanuvchi shartnomasi shartlarini o'zgartirish huquqini o'zida saqlab qoladi.
-         6.2. O'zgartirilgan foydalanuvchi shartnomasi botda e'lon qilinadi yoki foydalanuvchilarga bildirishnoma sifatida taqdim etiladi. Foydalanuvchilar vaqti-vaqti bilan foydalanuvchi shartnomasidagi o'zgarishlarni tekshirish majburiyatini oladilar.
-
-<b>7. Foydalanishni tugatish</b>
-         7.1. Foydalanuvchilar istalgan vaqtda botdan foydalanishni to‘xtatishi mumkin.
-         7.2. Agar foydalanuvchi ushbu foydalanuvchi shartnomasi shartlarini buzsa yoki foydalanuvchining harakatlari qonun yoki axloqiy va axloqiy me'yorlarga mos kelmasa, bot egasi foydalanuvchilarga xizmatlar ko'rsatishni to'xtatish huquqini o'zida saqlab qoladi.
-
-<b>8. Amaldagi qonunchilik va nizolarni hal qilish</b>
-         8.1. Ushbu foydalanuvchi shartnomasi bot egasi ro'yxatdan o'tgan mamlakat qonunlariga muvofiq tartibga solinadi va talqin qilinadi.
-         8.2. Bot egasi va foydalanuvchilar o'rtasida yuzaga keladigan har qanday nizolar muzokaralar va hamkorlik orqali hal qilinadi. Agar kelishuvga erishishning iloji bo'lmasa, nizolar vakolatli sudga yuboriladi.
-
-         Shuni yodda tutingki, ushbu foydalanuvchi shartnomasi faqat botdan foydalanishning umumiy qoidalari va shartlaridir. Bot egasi, shuningdek, bot ichida yoki uning veb-saytida mavjud bo'lishi mumkin bo'lgan qo'shimcha siyosat va shartlarga ega bo'lishi mumkin.
+Va quyida tanlang
             """,
-            "get_name": "Keling, ro'yxatdan o'tish jarayonini boshlaylik. Toʻliq ismingizni quyidagi formatda kiriting:\n\nFamiliya Ism otasining ismi\n\nBoʻsh joy bilan ajratilgan!",
-            "get_contact": "Kontaktni yuboring.",
-            "error_name_format": "Siz noto'g'ri formatda kiritdingiz❗️\n\nTo'liq ismingizni quidagi formatda kiriting:\n\nFamiliya Ism Ota ismi\n\nBo'sh joy bilan ajratilgan!",
-            "get_location": """
-Joylashuvni yuboring 
+            "get_name": """
+📝 Ro‘yxatdan o‘tish jarayonini boshlaylik. Familiya, ism, otangizning ismini quyidagi formatda kiriting: 
 
-Muhim eslatma: Uy manzilingizni ko'rsatishingiz kerak, chunki bu manzilni aniqlash uchun muhim.
+✍️ Familiya Ism Otasining ismi. 
+
+(Bo‘sh joy qoldiring!)
+
+""",
+            "get_contact": "📱 Quyidagi tugma orqali kontaktni yuboring.",
+            "error_name_format": """
+❌ Format noto‘g‘ri❗️
+
+✍️ Familiya, ism, otangizning ismini quyidagi formatda kiriting: Familiya Ism Otasining ismi. 
+
+(Bo‘sh joy qoldiring!)
+
+""",
+            "get_location": """
+📍 Manzilingizni yuboring.
+
+📝 Muhim eslatma: Uy manzilingizni yuboring, chunki bu aniq manzilni aniqlash uchun muhim.
+
             """,
             "get_address": """
-manzilingizni quyidagi formatda kiriting:
+🏠 Manzilingizni quyidagi formatda kiriting:
 
-Uy/kvartira/kirish/qavat
+Uy/kvartira/Podyezd/Qavat
 
 Misol: 30/16/2/1
+
             """,
-            "get_comment_to_address": "Manzilga sharhlar:",
+            "get_comment_to_address": """
+📝 Manzil bo‘yicha sharhlar:
+
+Sizni tezroq va aniqroq topishimizga yordam berish uchun qoʻshimcha maʼlumotlarni kiriting. Masalan, diqqatga sazovor joylar, binoga kirish uchun maxsus ko'rsatmalar yoki kurer uchun foydali bo'lishi mumkin bo'lgan boshqa eslatmalar.
+""",
             "error_address_format": """
-Sizning formatingiz noto'g'ri❗️
+❌ Format noto‘g‘ri❗️
 
-manzilingizni quyidagi formatda kiriting:
+🏠 Manzilingizni quyidagi formatda kiriting:
 
-Uy/kvartira/kirish/qavat
+Uy/kvartira/Podyezd/Qavat
 
 Misol: 30/16/2/1
+
             """,
-            "complete_registration": "Roʻyxatdan oʻtganingiz uchun tashakkur!",
-            "error": "Nimadir xato ketdi❗️",
+            "complete_registration": "🎉 Ro‘yxatdan o‘tganingiz uchun rahmat!",
+            "error": "⚠️ Nimadir noto‘g‘ri ketdi❗️",
             "register_btn": "Ro'yhatdan o'tish",
             "help_btn": "Yordam",
             "get_location_btn": "Joylashuvni yuborish",
-            "get_place": "Hududni tanlang:",
+            "get_place": "🗺 Tumanni tanlang:",
             "get_rate": """
-Juft va toq sanalarda maishiy chiqindilarni olib tashlash uchun boshlang'ich tarif mavjud.  
+📆 Hozirda “Start” tarifi bo‘yicha maishiy chiqindilarni juft va toq kunlarda olib chiqish xizmati mavjud.
 
-Tarif nomi "Start". 
+Tariff nomi: "Start".
 
-To'lov formati Click yoki Payme. 
+💳 To'lov Click yoki Payme orqali amalga oshiriladi.
 
-Xizmat narxi 200 000 ming so'm (bu oyiga 12 ta emissiyani o'z ichiga oladi)
+💸 Xizmat narxi: 200,000 so‘m (har oyda 12 marta chiqindi olib chiqish kiradi).
 
-To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
+🛎 To‘lovni tasdiqlash uchun sizga ilovada to‘lov haqida bildirishnoma keladi.
+
             """,
-            "already_registered": "Siz allaqachon ro'yxatdan o'tgansiz!",
-            "profile_error": "siz hali ro'yxatdan o'tmagansiz",
+            "already_registered": "✅ Siz allaqachon ro‘yxatdan o‘tgansiz!",
+            "profile_error": "🚫 Siz hali ro‘yxatdan o‘tmagansiz.",
             "profile_btn": "Profil",
             "create_order_btn": "Buyurtma yaratish",
             "actual_order_btn": "Joriy buyurtma",
@@ -129,24 +118,24 @@ To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
             "entrance_number_btn": "Kirish raqami",
             "floor_number_btn": "Qavat",
             "comment_btn": "Manzilga sharhlar",
-            "change_profile": "O'zgartirmoqchi bo'lgan maydonni tanlang:",
-            "change_name_message": "Yangi nom kiriting:",
-            "change_house_message": "Uy raqamini kiriting:",
-            "change_apartment_message": "Kvartira raqamini kiriting:",
-            "change_entrance_message": "Kirish raqamini kiriting:",
-            "change_floor_message": "Qavat raqamini kiriting:",
-            "change_comment_message": "Manzil uchun sharhlarni kiriting:",
+            "change_profile": "🛠 O‘zgartirmoqchi bo‘lgan maydonni tanlang:",
+            "change_name_message": "✍️ Yangi ismingizni kiriting:",
+            "change_house_message": "🏠 Uy raqamini kiriting:",
+            "change_apartment_message": "🏢 Kvartira raqamini kiriting:",
+            "change_entrance_message": "🚪 Podyezd raqamini kiriting:",
+            "change_floor_message": "🏙 Qavat raqamini kiriting:",
+            "change_comment_message": "✍️ Manzil bo‘yicha sharhlarni kiriting:",
             "error_changing": "Tugmani bosing",
-            "complete_changing": "Maʼlumotlar muvaffaqiyatli oʻzgartirildi!",
+            "complete_changing": "✅ Ma'lumotlar muvaffaqiyatli o‘zgartirildi!",
             "confirm_btn": "Tasdiqlash✅",
             "cancel_btn": "Rad etish❌",
             "delete_btn": "Akkaunt o'chirish❌",
             "edit_btn": "Profilni tahrirlash",
             "back_btn": "◀️Orqaga",
-            "help_message": "Administrator bilan bog'lanish",
-            "rate_count_error": "Buyurtmalaringiz tugadi, qolgan buyurtmalar soni 0 ta",
-            "order_success": "Buyurtma yaratildi - sizning buyurtmalaringiz balansi:",
-            "photo_load_error": "Surat yuklashda xatolik yuz berdi!",
+            "help_message": "💬 Operator bilan bog‘lanish uchun havola: @ECOAXL | @ECOAXL2",
+            "rate_count_error": "🛑 Buyurtmalaringiz tugadi, qolgan buyurtmalar soni - 0",
+            "order_success": "📝 Buyurtma yaratildi - qolgan buyurtmalaringiz soni:",
+            "photo_load_error": "⚠️ Rasmni yuklashda xatolik yuz berdi!",
             "name": "Ism:",
             "phone_number": "Kontakt:",
             "house_number": "Uy:",
@@ -157,10 +146,14 @@ To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
             "active": "Faol🟢",
             "not_active": "Faol emas🔴",
             "status": "Holat:",
-            "deleted_success": "Akkaunt muvaffaqiyatli o'chirildi!",
-            "accept_photo": "Kuryer buyurtmangizni qabul qilishi uchun eshigingiz yaqinidagi paketlarning fotosuratini yuboring.",
-            "not_ended_order_error": "Sizda tugallanmagan buyurtma bor, bizning kurerimiz buyurtmangizni tez orada tugatadi. Agar muammolar mavjud bo'lsa, 'Yordam' tugmasini bosing",
-            "not_order_error": "Sizda hali hech qanday buyurtma yo'q, Buyurtma yaratish tugmasini bosing",
+            "deleted_success": "✅ Hisob muvaffaqiyatli o‘chirildi!",
+            "accept_photo": "📸 Eshingizning oldidagi paketlarning fotosuratini yuboring, shunda kuryer aynan sizning buyurtmangizni olib ketishi mumkin.",
+            "not_ended_order_error": """
+⏳ Sizda tugallanmagan buyurtma mavjud, kuryerimiz yaqin orada buyurtmangizni yakunlaydi.
+
+Agar muammo bo'lsa, Yordam tugmasini bosing.
+""",
+            "not_order_error": "📦 Sizda hali mavjud buyurtmalar yo'q, Buyurtma yaratish tugmasini bosing.",
             "worker_status": "Kuryer holati:",
             "order_created_time": "Yaratilish vaqti:",
             "order_end": "Tugallandi🟢",
@@ -169,16 +162,16 @@ To'lovni tasdiqlash uchun siz ilovada to'lov bildirishnomalarini olasiz.
             "default_message": "To'liq ma'lumot olish uchun buyruqni kiriting / help",
             "get_contact_btn": "Raqamni yuborish",
             "change_language_btn": "Tilni o'zgartirish",
-            "change_language": "Tilni tanlang",
-            "change_language_success": "Til muvaffaqiyatli o'zgartirildi✅",
+            "change_language": "🌐 Tilni tanlang:",
+            "change_language_success": "✅ Til muvaffaqiyatli o'zgartirildi!",
             "back_message": """
 Botdan foydalanish uchun quidagi tugmalardan foydalaning:
 
 Profil - profilingiz xaqida malumot
 Yordam - administrator bilan bog'lanish
             """,
-            "active_customer": "Profilingiz muvofaqiyatli aktivlashtirildi, botni ishlatishingiz mumkin!",
-            "activation_error": "Profilni aktivlashtirish jarayonida xatolik boldi",
+            "active_customer": "🎉 Profilingiz muvaffaqiyatli faollashtirildi! Endi botdan foydalanishingiz mumkin!",
+            "activation_error": "⚠️ Xatolik yuz berdi, iltimos, keyinroq urinib ko'ring yoki administrator bilan bog'laning.",
             "not_registered_customer": "Siz ro'yhatga olinmagansiz iltimos administrator bilan bog'laning",
             "additions_message": "Qo'shimcha ma'lumot qo'shish uchun quyida tanlang.",
             "success_photo": "Rasim joylandi",
