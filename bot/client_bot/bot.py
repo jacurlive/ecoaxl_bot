@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from datetime import datetime
 from aiogram import types, F
+from aiogram.types import FSInputFile
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
@@ -186,14 +187,6 @@ async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
         localized_message = await get_localized_message(language_code, "register_type")
         await callback_query.message.answer(localized_message, reply_markup=register_type_k)
 
-
-        # ----------------- V1 ------------------
-        # localized_message = await get_localized_message(language=language_code, key="greeting_not_registered")
-        # localized_message_btn_1 = await get_localized_message(language=language_code, key="register_btn")
-        # localized_message_btn_2 = await get_localized_message(language=language_code, key="help_btn")
-        # register_btn = await register_keyboard(localized_message_btn_1, localized_message_btn_2)
-        # await callback_query.message.answer(localized_message, reply_markup=register_btn)
-        # await state.clear()
     else:
         error_message = await get_localized_message("none", "error")
         await callback_query.message.answer(error_message)
@@ -326,6 +319,12 @@ async def process_name(message: types.Message, state: FSMContext):
         full_name = message.text.split(" ")
         await state.update_data(name=full_name[1], last_name=full_name[0], surname=full_name[2],
                                 telegram_id=message.from_user.id)
+        
+        file_doc = FSInputFile(
+            path="publicOffer.pdf"
+        )
+
+        await bot.send_document(chat_id, file_doc)
         await message.answer(localized_message, reply_markup=confirm_btn, parse_mode="html")
         await state.set_state(RegistrationStates.confirmation)
     except IndexError or AttributeError as e:
@@ -401,8 +400,8 @@ async def callback_query_process_rate(callback_query: types.CallbackQuery, state
     language_code = language_data['lang']
 
     payment_k = await payment_type_keyboard("Click", "Payme")
-    await callback_query.message.answer("Choose payment type", reply_markup=payment_k)
-    # await bot.send_message(callback_query.from_user.id, localized_message, reply_markup=location_btn)
+    localized_message = await get_localized_message(language_code, "payment_type")
+    await callback_query.message.answer(localized_message, reply_markup=payment_k)
     await state.set_state(RegistrationStates.invoce)
 
 
@@ -419,8 +418,6 @@ async def invoce_process(message: types.Message, state: FSMContext):
         title = rate_data['rate_name']
         description = rate_data['description']
         rate_amount = rate_data['price']
-        url_photo = "http://127.0.0.1/media/rate-start.jpg"
-        print(url_photo)
 
         await bot.send_invoice(
             chat_id=message.from_user.id,
