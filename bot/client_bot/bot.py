@@ -4,8 +4,9 @@ import requests
 
 from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.combining import AndTrigger
 from datetime import datetime
 from aiogram import types, F
 from aiogram.types import FSInputFile
@@ -13,7 +14,6 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import DeleteWebhook
 from utils.translation.localization import get_localized_message
-from handlers.users.start import start_command
 from loader import bot, dp
 from data import config
 from utils.get_keyboard import get_profile_column, get_profile_view_btn
@@ -63,34 +63,6 @@ scheduler = AsyncIOScheduler(timezone='Asia/Tashkent')
 TOKEN = config.TOKEN
 
 
-@dp.message(Command("dep"))
-async def dep_test(message: types.Message):
-    await bot.send_invoice(
-        chat_id=message.from_user.id,
-        title="Title",
-        description="Description",
-        payload="Payload",
-        provider_token=config.CLICK_PROVIDER_TOKEN,
-        currency="UZS",
-        prices=[
-            types.LabeledPrice(label="Price Label", amount=12_000_000)
-        ],
-        max_tip_amount=500_000,
-        start_parameter="",
-        provider_data=None,
-        photo_url="https://fastly.picsum.photos/id/0/5000/3333.jpg?hmac=_j6ghY5fCfSD6tvtcV74zXivkJSPIfR9B8w34XeQmvU",
-        photo_height=200,
-        photo_width=300,
-        is_flexible=False,
-        protect_content=False,
-        need_name=True,
-        need_email=False,
-        need_phone_number=False,
-        need_shipping_address=False,
-        request_timeout=15
-    )
-
-
 async def send_place(message, options, language):
     kb = types.InlineKeyboardMarkup(
         inline_keyboard=[[types.InlineKeyboardButton(text=item['name'], callback_data=item['callback_data'])] for item
@@ -127,8 +99,14 @@ async def send_message_scheduler(chat_id):
 
 
 async def scheduler_daily_message(chat_id):
-    trigger = IntervalTrigger(days=2, hours=7, start_date="2024-06-26 12:00:00")
-    scheduler.add_job(send_message_scheduler, trigger, args=[chat_id])
+    start_date = datetime(year=2024, month=8, day=20, hour=12, minute=0, second=0)
+
+    cron_trigger = CronTrigger(hour=15, minute=41)
+
+    interval_trigger = IntervalTrigger(days=2, start_date=start_date)
+
+    combine_trigger = AndTrigger([cron_trigger, interval_trigger])
+    # scheduler.add_job(send_message_scheduler, combine_trigger, args=[chat_id])
 
 
 @dp.message(CommandStart())

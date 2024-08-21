@@ -96,13 +96,25 @@ Misol: 30/16/2/1
             "get_location_btn": "Joylashuvni yuborish",
             "get_place": "🗺 Tumanni tanlang:",
             "get_rate": """
-📆 Hozirda “Start” tarifi bo‘yicha maishiy chiqindilarni juft va toq kunlarda olib chiqish xizmati mavjud.
+📆 “Start” tarifi bo‘yicha maishiy chiqindilarni juft va toq kunlarda olib chiqish xizmati mavjud.
 
 Tariff nomi: "Start".
 
 💳 To'lov Click yoki Payme orqali amalga oshiriladi.
 
-💸 Xizmat narxi: 200,000 so‘m (har oyda 12 marta chiqindi olib chiqish kiradi).
+💸 Xizmat narxi: 100,000 so‘m (har oyda 15 marta chiqindi olib chiqish kiradi).
+
+-------------------------------------------------
+
+📆 "VIP" tarifi bo‘yicha maishiy chiqindilarni juft va toq kunlarda olib chiqish xizmati mavjud.
+
+Tariff nomi: "VIP".
+
+💳 To'lov Click yoki Payme orqali amalga oshiriladi.
+
+💸 Xizmat narxi: 200,000 so‘m (har oyda 30 marta chiqindi olib chiqish kiradi).
+
+
 
 🛎 To‘lovni tasdiqlash uchun sizga ilovada to‘lov haqida bildirishnoma keladi.
 
@@ -295,12 +307,28 @@ Yordam - administrator bilan bog'lanish
             "get_rate": """
 💰 Доступный тариф: "Start"
 
-Сейчас доступен тариф "Start" для выноса бытового мусора, который действует как по четным, так и по нечетным числам.
+Доступен тариф "Start" для выноса бытового мусора, который действует как по четным, так и по нечетным числам.
+
+🛠️ Что включает тариф:
+
+    Стоимость услуги: 100,000 сум
+    В тариф входит 15 выбросов в месяц!
+
+💳 Форматы оплаты:
+
+    Click
+    Payme
+
+----------------------------------------
+    
+💰 Доступный тариф: "VIP"
+
+Доступен тариф "VIP" для выноса бытового мусора, который действует как по четным, так и по нечетным числам.
 
 🛠️ Что включает тариф:
 
     Стоимость услуги: 200,000 сум
-    В тариф входит 12 выбросов в месяц!
+    В тариф входит 30 выбросов в месяц!
 
 💳 Форматы оплаты:
 
