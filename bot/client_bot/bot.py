@@ -638,6 +638,7 @@ async def additions_process(message: types.Message, state: FSMContext):
         await state.set_state(OrderCreate.comment)
     else:
         localized_message = await get_localized_message(language_code, "back_message")
+        await state.clear()
         await message.answer(localized_message, reply_markup=profile_btn)
 
 
