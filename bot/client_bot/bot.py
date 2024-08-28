@@ -623,23 +623,45 @@ async def change_language_process(callback_query: types.CallbackQuery, state: FS
 async def additions_process(message: types.Message, state: FSMContext):
     message_answer = message.text
     user_id = message.from_user.id
+    user_data = await get_user_data(user_id, token=TOKEN)
 
     language_data = await user_language(user_id=user_id, token=TOKEN)
     language_code = language_data['lang']
 
     profile_btn = await get_profile_view_btn(language_code=language_code)
 
-    if message_answer == "Photo":
-        localized_message = await get_localized_message(language_code, "accept_photo")
-        await message.answer(localized_message)
-        await state.set_state(OrderCreate.photo)
-    elif message_answer == "Comment":
-        await message.answer("Напишите коммент для этого заказа:")
-        await state.set_state(OrderCreate.comment)
+    if message_answer == "Да" or message_answer == "Xa":
+        rate_count = int(user_data["rate_count"])
+        if rate_count < 1:
+            localized_message = await get_localized_message(language_code, "rate_count_error")
+            await message.answer(localized_message, reply_markup=profile_btn)
+            return
+
+        context = {
+        "client_id": message.from_user.id
+        }
+
+        order = await create_order(data=context, token=TOKEN)
+
+        if order is not None:
+            new_count = rate_count - 1
+
+            user_context = {
+            "rate_count": str(new_count)
+            }
+
+            response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
+
+            if response_code == 200:
+                localized_message = await get_localized_message(language_code, "order_success")
+                await message.answer(f"{localized_message}{new_count}", reply_markup=profile_btn)
+        else:
+            localized_message = await get_localized_message(language_code, "error")
+            await message.answer(localized_message)
     else:
         localized_message = await get_localized_message(language_code, "back_message")
-        await state.clear()
         await message.answer(localized_message, reply_markup=profile_btn)
+    await state.clear()
 
 
 @dp.message()
@@ -726,36 +748,12 @@ async def registration_start(message: types.Message, state: FSMContext):
         case "Создать заказ" | "Buyurtma yaratish":
             order = await order_exist(message.from_user.id, token=TOKEN)
             if not order:
-                rate_count = int(user_data["rate_count"])
-                if rate_count < 1:
-                    localized_message = await get_localized_message(language_code, "rate_count_error")
-                    await message.answer(localized_message, reply_markup=profile_btn)
-                    return
-
-                context = {
-                    "client_id": message.from_user.id
-                }
-                order = await create_order(data=context, token=TOKEN)
-
-                if order is not None:
-                    new_count = rate_count - 1
-
-                    user_context = {
-                    "rate_count": str(new_count)
-                    }
-                    response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
-
-                    if response_code == 200:
-                        additions_kb = await additions_keyboard("Photo", "Comment", "Back", "Вынес мусор")
-                        localized_message = await get_localized_message(language_code, "order_success")
-                        localized_message_2 = await get_localized_message(language_code, "additions_message")
-                        await message.answer(f"{localized_message} {new_count}\n{localized_message_2}", reply_markup=additions_kb)
-                        order_id = order['id']
-                        await state.update_data(order_id=order_id)
-                        await state.set_state(OrderCreate.additions)
-                else:
-                    localized_message = await get_localized_message(language_code, "error")
-                    await message.answer(localized_message)
+                localized_message = await get_localized_message(language_code, "create_order")
+                localized_btn_1 = await get_localized_message(language_code, "yes")
+                localized_btn_2 = await get_localized_message(language_code, "no")
+                additions_kb = await additions_keyboard(localized_btn_1, localized_btn_2)
+                await message.answer(localized_message, reply_markup=additions_kb)
+                await state.set_state(OrderCreate.additions)
             else:
                 localized_message = await get_localized_message(language_code, "not_ended_order_error")
                 await message.answer(localized_message, reply_markup=profile_btn)

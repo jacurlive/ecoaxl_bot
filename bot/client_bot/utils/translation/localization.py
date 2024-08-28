@@ -191,7 +191,10 @@ Yordam - administrator bilan bog'lanish
             "account_activation": "Akkauntni faolashtirish",
             "register_type": "Ro'yhatdan o'tish usulini tanlang",
             "buy_rate": "Tariflar",
-            "payment_type": "To'lov turini tanlang"
+            "payment_type": "To'lov turini tanlang",
+            "yes": "Xa",
+            "no": "Yoq",
+            "create_order": "Buyurtma yaratmoqchimisiz"
         },
 
 
@@ -480,7 +483,10 @@ Yordam - administrator bilan bog'lanish
     2. Пройти регистрацию - для активации аккаунта
 """,
             "buy_rate": "Тарифы",
-            "payment_type": "❗️Выберите способ оплаты"
+            "payment_type": "❗️Выберите способ оплаты",
+            "yes": "Да",
+            "no": "Нет",
+            "create_order": "Вы точно хотите создать заказ"
         }
     }
 
