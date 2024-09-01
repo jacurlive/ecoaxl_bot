@@ -50,4 +50,6 @@ class RegisterType(StatesGroup):
 
 
 class Rates(StatesGroup):
-    pass
+    buy = State()
+    accept = State()
+    done = State()

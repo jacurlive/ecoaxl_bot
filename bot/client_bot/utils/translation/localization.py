@@ -194,7 +194,8 @@ Yordam - administrator bilan bog'lanish
             "payment_type": "To'lov turini tanlang",
             "yes": "Xa",
             "no": "Yoq",
-            "create_order": "Buyurtma yaratmoqchimisiz"
+            "create_order": "Buyurtma yaratmoqchimisiz",
+            "buy_rate_success": "Buyurtma xarid qilish jarayoni muvafaqiyatli otdi.\nBuyurtmalar qoldig'i: "
         },
 
 
@@ -486,7 +487,8 @@ Yordam - administrator bilan bog'lanish
             "payment_type": "❗️Выберите способ оплаты",
             "yes": "Да",
             "no": "Нет",
-            "create_order": "Вы точно хотите создать заказ"
+            "create_order": "Вы точно хотите создать заказ",
+            "buy_rate_success": "Покупка тарифа прошла успешно.\nВаш остаток заказов: "
         }
     }
 

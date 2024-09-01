@@ -23,7 +23,7 @@ from states.state import (
     OrderCreate,
     LanguageChange,
     TelegramIDPut,
-    RegisterType
+    Rates
 )
 from utils.fetch import (
     fetch_place_data,
@@ -619,6 +619,94 @@ async def change_language_process(callback_query: types.CallbackQuery, state: FS
         await bot.send_message(chat_id, local_message, reply_markup=profile_btn)
 
 
+@dp.callback_query(Rates.buy)
+async def callback_query_process_rate(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.update_data(rate=callback_query.data)
+    await callback_query.message.delete()
+    user_id = callback_query.from_user.id
+
+    language_data = await user_language(user_id=user_id, token=TOKEN)
+    language_code = language_data['lang']
+
+    payment_k = await payment_type_keyboard("Click", "Payme")
+    localized_message = await get_localized_message(language_code, "payment_type")
+    await callback_query.message.answer(localized_message, reply_markup=payment_k)
+    await state.set_state(Rates.accept)
+
+
+@dp.message(Rates.accept)
+async def invoce_process(message: types.Message, state: FSMContext):
+    message_answer = message.text
+    provider = config.CLICK_PROVIDER_TOKEN if message_answer == "Click" else config.PAYME_PROVIDER_TOKEN
+    data = await state.get_data()
+
+    rate_id = data.get("rate")
+    rate_data = await rate_detail(rate_id=rate_id, token=TOKEN)
+
+    if rate_data is not None:
+        title = rate_data['rate_name']
+        description = rate_data['description']
+        rate_amount = rate_data['price']
+
+        await bot.send_invoice(
+            chat_id=message.from_user.id,
+            title=title,
+            description=description,
+            payload="Payload",
+            provider_token=provider,
+            currency="UZS",
+            prices=[
+                types.LabeledPrice(label="Price Label", amount=rate_amount)
+            ],
+            max_tip_amount=500_000,
+            start_parameter="",
+            provider_data=None,
+            photo_url="https://ecoaxl.uz/media/rate-start.jpg",
+            photo_height=400,
+            photo_width=600,
+            is_flexible=False,
+            protect_content=False,
+            need_name=True,
+            need_email=False,
+            need_phone_number=False,
+            need_shipping_address=False,
+            request_timeout=15
+        )
+    await state.set_state(Rates.done)
+
+@dp.message(F.successful_payment, Rates.done)
+async def payment_handler(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    user_data = await get_user_data(user_id, token=TOKEN)
+
+    language_data = await user_language(user_id=user_id, token=TOKEN)
+    language_code = language_data['lang']
+
+    # text = f"*To'lov qabul qilindi*\n\nTo'langan summa: {message.successful_payment.total_amount}\n"
+    current_time = datetime.now()
+    iso_time = current_time.isoformat()
+    await state.update_data(is_active="true", payment_date=iso_time)
+    context = await state.get_data()
+    rate_id = context['rate']
+    rate = await rate_detail(rate_id, token=TOKEN)
+    rate_count = rate['rate_count']
+    user_rate_count = int(user_data["rate_count"])
+    new_count = rate_count + user_rate_count
+
+    user_context = {
+        "rate_count": str(new_count)
+    }
+
+    response_code = await user_change_column(message.from_user.id, data=user_context, token=TOKEN)
+    if response_code == 200:
+        localized_message = await get_localized_message(language_code, "buy_rate_success")
+        await message.answer(f"{localized_message}{new_count}")
+        # await message.answer(text)
+    else:
+        localized_message = await get_localized_message(language_code, "error")
+        await message.answer(localized_message)
+
+
 @dp.message(OrderCreate.additions)
 async def additions_process(message: types.Message, state: FSMContext):
     message_answer = message.text
@@ -638,7 +726,7 @@ async def additions_process(message: types.Message, state: FSMContext):
             return
 
         context = {
-        "client_id": message.from_user.id
+        "client_id": user_id
         }
 
         order = await create_order(data=context, token=TOKEN)
@@ -793,6 +881,8 @@ async def registration_start(message: types.Message, state: FSMContext):
             options = [{'name': item['rate_name'], 'callback_data': str(item['id'])} for item in rates_data]
 
             await send_rates(message, options, language_code)
+
+            await state.set_state(Rates.buy)
         case _:
             localized_message = await get_localized_message(language_code, "default_message")
             await message.answer(localized_message)
