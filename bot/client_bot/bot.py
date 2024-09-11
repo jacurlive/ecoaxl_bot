@@ -297,9 +297,10 @@ async def process_name(message: types.Message, state: FSMContext):
         full_name = message.text.split(" ")
         await state.update_data(name=full_name[1], last_name=full_name[0], surname=full_name[2],
                                 telegram_id=message.from_user.id)
+        file_name = "publicOfferRU.pdf" if language_code == "ru" else "publicOfferUZ.pdf"
         
         file_doc = FSInputFile(
-            path="publicOffer.pdf"
+            path=file_name
         )
 
         await bot.send_document(chat_id, file_doc)
@@ -885,7 +886,7 @@ async def registration_start(message: types.Message, state: FSMContext):
             await state.set_state(Rates.buy)
         case _:
             localized_message = await get_localized_message(language_code, "default_message")
-            await message.answer(localized_message)
+            await message.answer(localized_message, reply_markup=profile_btn)
 
 
 async def main():
