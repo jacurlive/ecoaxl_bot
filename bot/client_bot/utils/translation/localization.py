@@ -195,9 +195,8 @@ Yordam - administrator bilan bog'lanish
             "yes": "Xa",
             "no": "Yoq",
             "create_order": "Buyurtma yaratmoqchimisiz",
-            "buy_rate_success": "Buyurtma xarid qilish jarayoni muvafaqiyatli otdi.\nBuyurtmalar qoldig'i: "
-        },
-
+            "buy_rate_success": "Buyurtma xarid qilish jarayoni muvafaqiyatli otdi.\nBuyurtmalar qoldig'i: ",
+            "cancel_confirmation": "Botni qayta yuritish uchun /start buyrugini yuboring",
 
         'ru': {
             "greeting_registered": """
@@ -488,9 +487,10 @@ Yordam - administrator bilan bog'lanish
             "yes": "Да",
             "no": "Нет",
             "create_order": "Вы точно хотите создать заказ",
-            "buy_rate_success": "Покупка тарифа прошла успешно.\nВаш остаток заказов: "
+            "buy_rate_success": "Покупка тарифа прошла успешно.\nВаш остаток заказов: ",
+            "cancel_confirmation": "Для рестарта бота введите комманду /start"
         }
-    }
+    }}
 
     @staticmethod
     def get_translation(language, key):

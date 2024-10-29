@@ -330,7 +330,8 @@ async def confirmation_query(callback_query: types.CallbackQuery, state: FSMCont
         await state.set_state(RegistrationStates.phone_number)
 
     else:
-        await bot.send_message(callback_query.from_user.id, "Cancel")
+        localized_message = await get_localized_message(language_code, "cancel_confirmation")
+        await bot.send_message(callback_query.from_user.id, localized_message)
         await state.clear()
 
 
