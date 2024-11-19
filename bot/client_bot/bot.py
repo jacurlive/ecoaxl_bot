@@ -161,7 +161,7 @@ async def get_language(callback_query: types.CallbackQuery, state: FSMContext):
         localized_btn = await get_localized_message(language_code, "account_activation")
         localized_btn_2 = await get_localized_message(language_code, "register_btn")
         register_type_k = await register_type_keyboard(localized_btn, localized_btn_2)
-        
+
         localized_message = await get_localized_message(language_code, "register_type")
         await callback_query.message.answer(localized_message, reply_markup=register_type_k)
 
@@ -507,13 +507,14 @@ async def process_comment(message: types.Message, state: FSMContext):
 
     data = await state.get_data()
     chat_id = message.from_user.id
-    print(data)
 
     language_data = await user_language(user_id=chat_id, token=TOKEN)
     language_code = language_data['lang']
 
     try:
         await post_user_info(data=data, token=TOKEN)
+        registered_user = f"""name: {data['name']}\nlast name: {data['last_name']}\nsurname: {data['surname']}\ntelegram_id: {data['telegram_id']}\nphone number: {data['phone_number']}\npayment_date: {data['payment_date']}"""
+        await bot.send_message(5812918934, registered_user)
         localized_message = await get_localized_message(language_code, "complete_registration")
         profile_btn = await get_profile_view_btn(language_code=language_code)
         await bot.send_message(message.from_user.id, localized_message, reply_markup=profile_btn)
